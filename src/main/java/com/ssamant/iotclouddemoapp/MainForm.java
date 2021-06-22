@@ -10,12 +10,15 @@ import com.ssamant.connectioninfo.ConnectionInfo;
 import com.ssamant.dbservice.DBOperations;
 import java.awt.Color;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -30,6 +33,8 @@ public class MainForm extends javax.swing.JFrame {
         initComponents();
         ((JLabel) comboBoxMsgProtocols.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         ((JLabel) comboBoxRegDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+        populateAllDevices(); //populate existing IoT devices into combo box.
+        populateTableWithdeviceIds();
     }
 
     /**
@@ -93,17 +98,17 @@ public class MainForm extends javax.swing.JFrame {
 
         jTableDeviceList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Device ID", "Owner", "Select"
+                "Device ID", "Owner", "Status", "Select"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true
+                false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -197,6 +202,11 @@ public class MainForm extends javax.swing.JFrame {
         });
 
         btnStopSending.setText("Stop Sending");
+        btnStopSending.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStopSendingActionPerformed(evt);
+            }
+        });
 
         jPanelImage.setBackground(new java.awt.Color(204, 255, 255));
 
@@ -371,14 +381,14 @@ public class MainForm extends javax.swing.JFrame {
      * @param evt
      */
     private void btnRegisterIoTDeviceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterIoTDeviceActionPerformed
-        
+
         if (!"".equals(txtFieldNumDevices.getText().trim()) && !"".equals(txtFieldDeviceOwner.getText().trim())) {
             try {
                 int numOfDevices = Integer.parseInt(txtFieldNumDevices.getText().trim());
                 if (numOfDevices == 1) {
                     //call device reg method through DPS individual device enrollment passing the device owner info
                     ProvisioningIndividualEnrollment.beginIndividualDeviceRegistration(txtFieldDeviceOwner.getText().trim().toLowerCase());
-                    
+
                 } else {
                     // bulk device registration - using Group Enrollment DPS service
                     for (int i = 0; i < numOfDevices; i++) {
@@ -386,7 +396,13 @@ public class MainForm extends javax.swing.JFrame {
                     }
                 }
                 labelDeviceRegSuccess.setText("Device(s) registered successfully!");
+                this.comboBoxRegDevices.removeAllItems(); //clear all items before populating with updated device entries.
                 populateAllDevices();
+                DefaultTableModel model = (DefaultTableModel) jTableDeviceList.getModel();
+                model.setRowCount(0);
+                //tableModel.fireTableDataChanged();
+                populateTableWithdeviceIds();
+
             } catch (NumberFormatException ex) {
                 System.out.println(ex.getMessage());
             } catch (IOException ex) {
@@ -394,7 +410,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnRegisterIoTDeviceActionPerformed
-    
+
     private void populateAllDevices() {
         ArrayList<String> devices = DBOperations.getAllDeviceIds();
         devices.forEach(dev -> {
@@ -408,21 +424,65 @@ public class MainForm extends javax.swing.JFrame {
      * @param evt
      */
     private void btnSendTelemetryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendTelemetryActionPerformed
-        
+
         String deviceId = comboBoxRegDevices.getSelectedItem().toString();
         String transportProtocol = comboBoxMsgProtocols.getSelectedItem().toString();
         String telemInterval = txtFieldTelemFrequency.getText().trim();
-        String msgSize = txtFieldMsgSize.getText().trim();        
+        String msgSize = txtFieldMsgSize.getText().trim();
         int duration = Integer.parseInt(txtFieldDuration.getText().trim());
-        
+
         Device device = new Device();
         device.setMessageSize(msgSize);
         device.setDeviceId(deviceId);
         device.setProtocol(transportProtocol);
         device.setTelemInterval(telemInterval);
-        
+
         DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
+        System.out.println("Start sending telemetry to cloud...");
+       
+        DefaultTableModel model = (DefaultTableModel) jTableDeviceList.getModel();
+        model.setRowCount(0);
+        populateTableWithdeviceIds();
     }//GEN-LAST:event_btnSendTelemetryActionPerformed
+
+    private void btnStopSendingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopSendingActionPerformed
+        DeviceTelemetryService.stopSendindTelemetry(comboBoxRegDevices.getSelectedItem().toString());        
+        DefaultTableModel model = (DefaultTableModel) jTableDeviceList.getModel();
+        model.setRowCount(0);
+        populateTableWithdeviceIds();
+    }//GEN-LAST:event_btnStopSendingActionPerformed
+
+    // public static Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+    // public static Vector<String> columns = new Vector<String>();
+    // public static DefaultTableModel tableModel = new DefaultTableModel(data, columns);
+    private void populateTableWithdeviceIds() {
+
+        ResultSet rs = DBOperations.getAllDevices();
+
+        int columnCount = jTableDeviceList.getColumnCount();
+        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+        Vector<String> columns = new Vector<String>();
+
+        for (int column = 0; column < columnCount; column++) {
+            columns.add(jTableDeviceList.getColumnName(column));
+        }
+        jTableDeviceList.setAutoCreateColumnsFromModel(false);
+        DefaultTableModel tableModel = new DefaultTableModel(data, columns);
+        jTableDeviceList.setModel(tableModel);
+
+        try {
+            while (rs.next()) {
+                Vector<String> newRow = new Vector<>();
+                for (int columnIndex = 1; columnIndex <= columnCount - 1; columnIndex++) {
+                    newRow.add(rs.getString(columnIndex));
+                }
+                tableModel.addRow(newRow);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 
     /**
      * @param args the command line arguments
