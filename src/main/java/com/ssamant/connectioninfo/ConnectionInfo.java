@@ -60,7 +60,7 @@ public class ConnectionInfo {
         return symmkeyGroup;
     }
 
-    public static Connection getDbConnection() throws SQLException {
+    public static Connection getDbConnection() {
         String driver = "org.postgresql.Driver";
         Properties prop = readPropertyFile();
         String postgresHost = prop.getProperty("com.ssamant.connectioninfo.postgres.hostUrl");
@@ -70,10 +70,15 @@ public class ConnectionInfo {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ConnectionInfo.class.getName()).log(Level.SEVERE, null, ex);
+            
+            System.out.println(ex.getMessage());
         }
-        //con = DriverManager.getConnection("jdbc:mysql://136.186.108.219:3306/dpp_resources", "root", "dpp2020*");
-        con = DriverManager.getConnection(postgresHost + "/" + postgresDb, username, password);
+        try {
+            //con = DriverManager.getConnection("jdbc:mysql://136.186.108.219:3306/dpp_resources", "root", "dpp2020*");
+            con = DriverManager.getConnection(postgresHost + "/" + postgresDb, username, password);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());           
+        }
         if (con != null) {
             System.out.println("Database connection successful.");
         } else {

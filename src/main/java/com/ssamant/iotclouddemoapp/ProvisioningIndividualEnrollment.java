@@ -10,6 +10,7 @@ import com.microsoft.azure.sdk.iot.provisioning.device.*;
 import com.microsoft.azure.sdk.iot.provisioning.device.internal.exceptions.ProvisioningDeviceClientException;
 import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderSymmetricKey;
 import com.ssamant.connectioninfo.ConnectionInfo;
+import com.ssamant.dbservice.DBOperations;
 //import com.microsoft.azure.sdk.iot.provisioning.device.internal.exceptions.ProvisioningDeviceClientException;
 //import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderSymmetricKey;
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class ProvisioningIndividualEnrollment {
         }
     }
 
-    public static void beginIndividualDeviceRegistration() throws IOException {
+    public static void beginIndividualDeviceRegistration(String deviceOwner) throws IOException {
 
         System.out.println("Starting...");
         System.out.println("Beginning setup.");
@@ -100,6 +101,13 @@ public class ProvisioningIndividualEnrollment {
                 System.out.println("IoTHUb Uri : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getIothubUri());
                 System.out.println("Device ID : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
                 
+                Device device = new Device();
+                device.setDeviceId(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
+                device.setConnectionString(SYMMETRIC_KEY);
+                device.setIotHubUri(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getIothubUri());
+                device.setDeviceOwner(deviceOwner);
+                DBOperations.newDeviceEntry(device);
+                System.out.println("device info updated successfully into the resource database!");
 
                 //block to test telemetry send to cloud 
                 // connect to iothub

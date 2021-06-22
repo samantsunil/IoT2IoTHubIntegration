@@ -10,22 +10,44 @@ package com.ssamant.iotclouddemoapp;
  * @author Sunil
  */
 public class Device {
-    
-    public Device(){
-        
-    }
+
     private String deviceId;
     private String connectionString;
-    private int messageSize;
-    private int telemInterval;
+    private String messageSize;
+    private String telemInterval;
     private String protocol;
+    private String iotHubUri;
+    private String deviceOwner;
 
-    public Device(String deviceId, String connectionString, int messageSize, int telemInterval, String protocol) {
+    public Device() {
+
+    }
+
+    public Device(String deviceId, String connectionString, String iotHubUri, String messageSize, String telemInterval, String protocol, String deviceOwner) {
+
         this.deviceId = deviceId;
         this.connectionString = connectionString;
+        this.iotHubUri = iotHubUri;
         this.messageSize = messageSize;
         this.telemInterval = telemInterval;
         this.protocol = protocol;
+        this.deviceOwner = deviceOwner;
+    }
+
+    public String getDeviceOwner() {
+        return deviceOwner;
+    }
+
+    public void setDeviceOwner(String deviceOwner) {
+        this.deviceOwner = deviceOwner;
+    }
+
+    public String getIotHubUri() {
+        return iotHubUri;
+    }
+
+    public void setIotHubUri(String iotHubUri) {
+        this.iotHubUri = iotHubUri;
     }
 
     public String getDeviceId() {
@@ -44,19 +66,19 @@ public class Device {
         this.connectionString = connectionString;
     }
 
-    public int getMessageSize() {
+    public String getMessageSize() {
         return messageSize;
     }
 
-    public void setMessageSize(int messageSize) {
+    public void setMessageSize(String messageSize) {
         this.messageSize = messageSize;
     }
 
-    public int getTelemInterval() {
+    public String getTelemInterval() {
         return telemInterval;
     }
 
-    public void setTelemInterval(int telemInterval) {
+    public void setTelemInterval(String telemInterval) {
         this.telemInterval = telemInterval;
     }
 
@@ -67,7 +89,5 @@ public class Device {
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }
-    
-    
-    
+
 }

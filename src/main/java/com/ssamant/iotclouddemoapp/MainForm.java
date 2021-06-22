@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 
 /**
  *
@@ -25,6 +26,8 @@ public class MainForm extends javax.swing.JFrame {
      */
     public MainForm() {
         initComponents();
+        ((JLabel) comboBoxMsgProtocols.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+        ((JLabel) comboBoxRegDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
     }
 
     /**
@@ -43,6 +46,10 @@ public class MainForm extends javax.swing.JFrame {
         txtFieldNumDevices = new javax.swing.JTextField();
         btnRegisterIoTDevice = new javax.swing.JButton();
         labelDeviceRegSuccess = new javax.swing.JLabel();
+        jScrollPaneDeviceList = new javax.swing.JScrollPane();
+        jTableDeviceList = new javax.swing.JTable();
+        jLabel7 = new javax.swing.JLabel();
+        txtFieldDeviceOwner = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         comboBoxMsgProtocols = new javax.swing.JComboBox<>();
@@ -51,12 +58,12 @@ public class MainForm extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         txtFieldMsgSize = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtFieldSendingDeviceNums = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtFieldDuration = new javax.swing.JTextField();
         btnSendTelemetry = new javax.swing.JButton();
         btnStopSending = new javax.swing.JButton();
         jPanelImage = new javax.swing.JPanel();
+        comboBoxRegDevices = new javax.swing.JComboBox<>();
         jPanelSendTelemetry = new javax.swing.JPanel();
         jPanelDeviceDetails = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -82,33 +89,79 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        jTableDeviceList.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Device ID", "Owner", "Select"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPaneDeviceList.setViewportView(jTableDeviceList);
+
+        jLabel7.setText("Device owner:");
+
+        txtFieldDeviceOwner.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtFieldDeviceOwner.setText("XYZ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnRegisterIoTDevice, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtFieldNumDevices, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(39, 39, 39)
-                .addComponent(labelDeviceRegSuccess, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(53, Short.MAX_VALUE))
+                        .addGap(24, 24, 24)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(53, 53, 53))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtFieldNumDevices, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                    .addComponent(txtFieldDeviceOwner))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(165, 165, 165)
+                        .addComponent(labelDeviceRegSuccess, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnRegisterIoTDevice, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addComponent(jScrollPaneDeviceList)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFieldNumDevices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelDeviceRegSuccess))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnRegisterIoTDevice)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(26, 26, 26)
+                        .addComponent(labelDeviceRegSuccess))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtFieldNumDevices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(txtFieldDeviceOwner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnRegisterIoTDevice))))
+                .addGap(25, 25, 25)
+                .addComponent(jScrollPaneDeviceList, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -127,10 +180,7 @@ public class MainForm extends javax.swing.JFrame {
         txtFieldMsgSize.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFieldMsgSize.setText("100");
 
-        jLabel5.setText("No of devices sending telemetry:");
-
-        txtFieldSendingDeviceNums.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtFieldSendingDeviceNums.setText("1");
+        jLabel5.setText("Select device:");
 
         jLabel6.setText("Duration (in minutes):");
 
@@ -146,44 +196,46 @@ public class MainForm extends javax.swing.JFrame {
 
         btnStopSending.setText("Stop Sending");
 
-        jPanelImage.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelImage.setBackground(new java.awt.Color(204, 255, 255));
 
         javax.swing.GroupLayout jPanelImageLayout = new javax.swing.GroupLayout(jPanelImage);
         jPanelImage.setLayout(jPanelImageLayout);
         jPanelImageLayout.setHorizontalGroup(
             jPanelImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 444, Short.MAX_VALUE)
+            .addGap(0, 256, Short.MAX_VALUE)
         );
         jPanelImageLayout.setVerticalGroup(
             jPanelImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 273, Short.MAX_VALUE)
         );
 
+        comboBoxRegDevices.setAutoscrolls(true);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnStopSending, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
-                    .addComponent(btnSendTelemetry, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
-                    .addComponent(comboBoxMsgProtocols, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtFieldTelemFrequency)
-                    .addComponent(txtFieldMsgSize)
-                    .addComponent(txtFieldSendingDeviceNums)
-                    .addComponent(txtFieldDuration))
-                .addGap(18, 18, 18)
-                .addComponent(jPanelImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(34, 34, 34)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtFieldTelemFrequency)
+                            .addComponent(txtFieldMsgSize)
+                            .addComponent(comboBoxMsgProtocols, 0, 372, Short.MAX_VALUE)
+                            .addComponent(txtFieldDuration)
+                            .addComponent(btnSendTelemetry, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboBoxRegDevices, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(btnStopSending, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(68, 68, 68)
+                .addComponent(jPanelImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,28 +245,31 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(jPanelImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(comboBoxMsgProtocols, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtFieldTelemFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(txtFieldMsgSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(20, 20, 20)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(txtFieldSendingDeviceNums, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                            .addComponent(comboBoxRegDevices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6)
-                            .addComponent(txtFieldDuration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel4))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(txtFieldTelemFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtFieldMsgSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboBoxMsgProtocols, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtFieldDuration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSendTelemetry)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnStopSending)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnStopSending)
+                        .addGap(26, 26, 26)))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -222,18 +277,18 @@ public class MainForm extends javax.swing.JFrame {
         jPanelConfigParams.setLayout(jPanelConfigParamsLayout);
         jPanelConfigParamsLayout.setHorizontalGroup(
             jPanelConfigParamsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanelConfigParamsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanelConfigParamsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         jPanelConfigParamsLayout.setVerticalGroup(
             jPanelConfigParamsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelConfigParamsLayout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(123, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         tabbedPaneMain.addTab("Register Device & Config Params", jPanelConfigParams);
@@ -308,8 +363,6 @@ public class MainForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
-
     /**
      * function to register device(s) to IoT Hub
      *
@@ -317,48 +370,48 @@ public class MainForm extends javax.swing.JFrame {
      */
     private void btnRegisterIoTDeviceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterIoTDeviceActionPerformed
 
-        if (!"".equals(txtFieldNumDevices.getText().trim())) {
+        if (!"".equals(txtFieldNumDevices.getText().trim()) && !"".equals(txtFieldDeviceOwner.getText().trim())) {
             try {
                 int numOfDevices = Integer.parseInt(txtFieldNumDevices.getText().trim());
                 if (numOfDevices == 1) {
-                    //single device registration 
-                    if (ConnectionInfo.con == null) {
-                        ConnectionInfo.getDbConnection();
-
-                    }
-                    //call device reg method through DPS individual device enrollment 
-                    ProvisioningIndividualEnrollment.beginIndividualDeviceRegistration();
+                   //call device reg method through DPS individual device enrollment passing the device owner info
+                    ProvisioningIndividualEnrollment.beginIndividualDeviceRegistration(txtFieldDeviceOwner.getText().trim().toLowerCase());
 
                 } else {
                     // bulk device registration - using Group Enrollment DPS service
-                    for(int i = 0; i < numOfDevices; i++) {
-                        ProvisioningGroupEnrollment.beginDeviceProvisioningUnderGroupEnrollment("0" + String.valueOf(i));
+                    for (int i = 0; i < numOfDevices; i++) {
+                        ProvisioningGroupEnrollment.beginDeviceProvisioningUnderGroupEnrollment("-" + txtFieldDeviceOwner.getText().trim().toLowerCase() + "0" + String.valueOf(i));
                     }
                 }
                 labelDeviceRegSuccess.setText("Device(s) registered successfully!");
             } catch (NumberFormatException ex) {
                 System.out.println(ex.getMessage());
-            } catch (SQLException | IOException ex) {
+            } catch (IOException ex) {
                 Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                labelDeviceRegSuccess.setForeground(Color.red);
-                labelDeviceRegSuccess.setText("Device registration failed...");
             }
         }
     }//GEN-LAST:event_btnRegisterIoTDeviceActionPerformed
-    
+
     /**
      * Send device telemetry to cloud based on the configured parameters
-     * @param evt 
+     *
+     * @param evt
      */
     private void btnSendTelemetryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendTelemetryActionPerformed
-        
+
+        String deviceId = comboBoxRegDevices.getSelectedItem().toString();
         String transportProtocol = comboBoxMsgProtocols.getSelectedItem().toString();
-        int telemInterval = Integer.parseInt(txtFieldTelemFrequency.getText().trim());
-        int msgSize = Integer.parseInt(txtFieldMsgSize.getText().trim());
-        int noOfDevice = Integer.parseInt(txtFieldSendingDeviceNums.getText().trim());
+        String telemInterval = txtFieldTelemFrequency.getText().trim();
+        String msgSize = txtFieldMsgSize.getText().trim();   
         int duration = Integer.parseInt(txtFieldDuration.getText().trim());
-        Device device = new Device("device-id", "connection-string", msgSize, telemInterval, transportProtocol);
-        DeviceTelemetryService.sendDeviceTelemetryToCloud(device);
+        
+        Device device = new Device();
+        device.setMessageSize(msgSize);
+        device.setDeviceId(deviceId);
+        device.setProtocol(transportProtocol);
+        device.setTelemInterval(telemInterval);
+        
+        DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
     }//GEN-LAST:event_btnSendTelemetryActionPerformed
 
     /**
@@ -399,12 +452,14 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnSendTelemetry;
     private javax.swing.JButton btnStopSending;
     private javax.swing.JComboBox<String> comboBoxMsgProtocols;
+    private javax.swing.JComboBox<String> comboBoxRegDevices;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     public javax.swing.JPanel jPanelConfigParams;
@@ -412,13 +467,15 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelImage;
     public javax.swing.JPanel jPanelSendTelemetry;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPaneDeviceList;
+    private javax.swing.JTable jTableDeviceList;
     public javax.swing.JLabel labelDeviceRegSuccess;
     private javax.swing.JTabbedPane tabbedPaneMain;
     private javax.swing.JTable tableDeviceInfo;
+    private javax.swing.JTextField txtFieldDeviceOwner;
     private javax.swing.JTextField txtFieldDuration;
     private javax.swing.JTextField txtFieldMsgSize;
     private javax.swing.JTextField txtFieldNumDevices;
-    private javax.swing.JTextField txtFieldSendingDeviceNums;
     private javax.swing.JTextField txtFieldTelemFrequency;
     // End of variables declaration//GEN-END:variables
 }

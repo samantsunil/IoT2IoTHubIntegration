@@ -7,6 +7,7 @@ package com.ssamant.iotclouddemoapp;
 
 import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
+import com.ssamant.dbservice.DBOperations;
 
 /**
  *
@@ -22,9 +23,11 @@ public class DeviceTelemetryService {
         }
     }
 
-    public static void sendDeviceTelemetryToCloud(Device device) {
-         
+    public static void sendDeviceTelemetryToCloud(Device device, int duration) {
+
+        DBOperations.dbUpdateDeviceInfo(device);
         
+
     }
 
 }
