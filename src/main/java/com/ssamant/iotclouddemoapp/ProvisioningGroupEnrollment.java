@@ -10,6 +10,8 @@ import com.microsoft.azure.sdk.iot.provisioning.device.*;
 import com.microsoft.azure.sdk.iot.provisioning.device.internal.exceptions.ProvisioningDeviceClientException;
 import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderSymmetricKey;
 import com.ssamant.connectioninfo.ConnectionInfo;
+import com.ssamant.dbservice.DBOperations;
+import static com.ssamant.iotclouddemoapp.ProvisioningIndividualEnrollment.SYMMETRIC_KEY;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -63,8 +65,10 @@ public class ProvisioningGroupEnrollment {
      * method to provision individual device under group enrollment DPS service.
      *
      * @param deviceNum
+     * @param deviceOwner
+     * @throws java.io.IOException
      */
-    public static void beginDeviceProvisioningUnderGroupEnrollment(String deviceNum) throws IOException {
+    public static void beginDeviceProvisioningUnderGroupEnrollment(String deviceNum, String deviceOwner) throws IOException {
 
         String deviceId = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase() + deviceNum;
 
@@ -109,6 +113,14 @@ public class ProvisioningGroupEnrollment {
                 System.out.println("Device ID : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
                 
                 System.out.println("Primary key for the device: " + derivedSymmetricKeyPerDevice);
+                
+                 Device device = new Device();
+                device.setDeviceId(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
+                device.setConnectionString(derivedSymmetricKeyPerDevice);
+                device.setIotHubUri(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getIothubUri());
+                device.setDeviceOwner(deviceOwner);
+                DBOperations.newDeviceEntry(device);
+                System.out.println("device info updated successfully into the resource database!");
 
                 // block to send data to IoT Hub
                 /*

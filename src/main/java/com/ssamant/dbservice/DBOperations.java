@@ -9,7 +9,10 @@ import com.ssamant.connectioninfo.ConnectionInfo;
 import static com.ssamant.connectioninfo.ConnectionInfo.getDbConnection;
 import com.ssamant.iotclouddemoapp.Device;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,9 +62,32 @@ public class DBOperations {
         }
 
     }
-    
+
     public static void getDeviceConnectionInfo(String deviceId) {
-        
+
+    }
+
+    public static ArrayList getAllDeviceIds() {
+        if (ConnectionInfo.con == null) {
+            ConnectionInfo.con = getDbConnection();
+        }
+        ArrayList<String> deviceList = new ArrayList<>();
+        String qry = "SELECT deviceid from deviceinfo";
+        try {
+            Statement stm;
+            stm = ConnectionInfo.con.createStatement();
+
+            ResultSet rs = stm.executeQuery(qry);
+            
+            while (rs.next()){
+                String deviceId = rs.getString("deviceid");
+                deviceList.add(deviceId);
+            } 
+
+        } catch (SQLException ex) {
+
+        }
+        return deviceList;
     }
 
 }

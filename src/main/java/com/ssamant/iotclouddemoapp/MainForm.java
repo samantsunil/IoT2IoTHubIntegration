@@ -7,9 +7,11 @@ package com.ssamant.iotclouddemoapp;
 
 import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderSymmetricKey;
 import com.ssamant.connectioninfo.ConnectionInfo;
+import com.ssamant.dbservice.DBOperations;
 import java.awt.Color;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -369,21 +371,22 @@ public class MainForm extends javax.swing.JFrame {
      * @param evt
      */
     private void btnRegisterIoTDeviceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterIoTDeviceActionPerformed
-
+        
         if (!"".equals(txtFieldNumDevices.getText().trim()) && !"".equals(txtFieldDeviceOwner.getText().trim())) {
             try {
                 int numOfDevices = Integer.parseInt(txtFieldNumDevices.getText().trim());
                 if (numOfDevices == 1) {
-                   //call device reg method through DPS individual device enrollment passing the device owner info
+                    //call device reg method through DPS individual device enrollment passing the device owner info
                     ProvisioningIndividualEnrollment.beginIndividualDeviceRegistration(txtFieldDeviceOwner.getText().trim().toLowerCase());
-
+                    
                 } else {
                     // bulk device registration - using Group Enrollment DPS service
                     for (int i = 0; i < numOfDevices; i++) {
-                        ProvisioningGroupEnrollment.beginDeviceProvisioningUnderGroupEnrollment("-" + txtFieldDeviceOwner.getText().trim().toLowerCase() + "0" + String.valueOf(i));
+                        ProvisioningGroupEnrollment.beginDeviceProvisioningUnderGroupEnrollment("-" + txtFieldDeviceOwner.getText().trim().toLowerCase() + "0" + String.valueOf(i), txtFieldDeviceOwner.getText().trim().toLowerCase());
                     }
                 }
                 labelDeviceRegSuccess.setText("Device(s) registered successfully!");
+                populateAllDevices();
             } catch (NumberFormatException ex) {
                 System.out.println(ex.getMessage());
             } catch (IOException ex) {
@@ -391,6 +394,13 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnRegisterIoTDeviceActionPerformed
+    
+    private void populateAllDevices() {
+        ArrayList<String> devices = DBOperations.getAllDeviceIds();
+        devices.forEach(dev -> {
+            comboBoxRegDevices.addItem(dev);
+        });
+    }
 
     /**
      * Send device telemetry to cloud based on the configured parameters
@@ -398,11 +408,11 @@ public class MainForm extends javax.swing.JFrame {
      * @param evt
      */
     private void btnSendTelemetryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendTelemetryActionPerformed
-
+        
         String deviceId = comboBoxRegDevices.getSelectedItem().toString();
         String transportProtocol = comboBoxMsgProtocols.getSelectedItem().toString();
         String telemInterval = txtFieldTelemFrequency.getText().trim();
-        String msgSize = txtFieldMsgSize.getText().trim();   
+        String msgSize = txtFieldMsgSize.getText().trim();        
         int duration = Integer.parseInt(txtFieldDuration.getText().trim());
         
         Device device = new Device();
