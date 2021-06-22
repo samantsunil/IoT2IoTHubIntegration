@@ -111,10 +111,10 @@ public class ProvisioningGroupEnrollment {
 
                 System.out.println("IotHUb Uri : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getIothubUri());
                 System.out.println("Device ID : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
-                
+
                 System.out.println("Primary key for the device: " + derivedSymmetricKeyPerDevice);
-                
-                 Device device = new Device();
+
+                Device device = new Device();
                 device.setDeviceId(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
                 device.setConnectionString(derivedSymmetricKeyPerDevice);
                 device.setIotHubUri(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getIothubUri());

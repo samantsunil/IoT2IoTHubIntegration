@@ -25,9 +25,13 @@ public class DeviceTelemetryService {
 
     public static void sendDeviceTelemetryToCloud(Device device, int duration) {
 
-        DBOperations.dbUpdateDeviceInfo(device);
+        DBOperations.dbUpdateDeviceInfo(device, true);
         
 
+    }
+    
+    public static void stopSendindTelemetry(String deviceId) {
+        DBOperations.updateDeviceStatus(deviceId, false);
     }
 
 }
