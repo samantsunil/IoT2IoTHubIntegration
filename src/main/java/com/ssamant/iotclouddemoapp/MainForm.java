@@ -481,15 +481,16 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeviceDeregisterActionPerformed
 
     /**
-     * function to populate the device info into table as well as deleting the selected devices from the table.
+     * function to populate the device info into table as well as deleting the
+     * selected devices from the table.
      */
     private void populateTableWithdeviceIds() {
 
         ResultSet rs = DBOperations.getAllDevices();
 
         int columnCount = jTableDeviceList.getColumnCount();
-        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-        Vector<String> columns = new Vector<String>();
+        Vector<Vector<Object>> data = new Vector<>();
+        Vector<String> columns = new Vector<>();
 
         for (int column = 0; column < columnCount; column++) {
             columns.add(jTableDeviceList.getColumnName(column));
@@ -502,7 +503,15 @@ public class MainForm extends javax.swing.JFrame {
             while (rs.next()) {
                 Vector<String> newRow = new Vector<>();
                 for (int columnIndex = 1; columnIndex <= columnCount - 1; columnIndex++) {
-                    newRow.add(rs.getString(columnIndex));
+                    if ("t".equals(rs.getString(columnIndex))) {
+                        String status = "true";
+                        newRow.add(status);
+                    } else if ("f".equals(rs.getString(columnIndex))) {
+                        String status = "false";
+                        newRow.add(status);
+                    } else {
+                        newRow.add(rs.getString(columnIndex));
+                    }
                 }
 
                 tableModel.addRow(newRow);
@@ -516,12 +525,16 @@ public class MainForm extends javax.swing.JFrame {
                 for (int i = jTableDeviceList.getRowCount() - 1; i >= 0; i--) {
                     Boolean selected = (Boolean) jTableDeviceList.getValueAt(i, 0);
                     System.out.println(selected + " : " + i);
-                    
+
                     if (selected) {
                         int option = JOptionPane.showConfirmDialog(null, "Are you sure de-registering the selected devices?", "CONFIRM MESSAGE", JOptionPane.YES_NO_OPTION);
                         if (option == JOptionPane.YES_OPTION) {
+                            String deviceId = (String) jTableDeviceList.getValueAt(i, 1);
+                            System.out.println("selected deviceId: " + deviceId);
                             wrapperModel.removeRow(i);
                             //add code to deregister devices from IoT Hub and update database.
+                            DBOperations.deRegisterDevice(deviceId);
+
                         } else {
                             //simply return
                         }
@@ -576,7 +589,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnDeviceDeregister;
     public javax.swing.JButton btnRegisterIoTDevice;
     private javax.swing.JButton btnSendTelemetry;
-    private javax.swing.JButton btnStopSending;
+    public javax.swing.JButton btnStopSending;
     private javax.swing.JComboBox<String> comboBoxMsgProtocols;
     private javax.swing.JComboBox<String> comboBoxRegDevices;
     private javax.swing.JLabel jLabel1;

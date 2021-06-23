@@ -131,7 +131,10 @@ public class DBOperations {
         }
         return deviceList;
     }
-
+/**
+ * method to obtain device info, such as device id, deviceowner and active status.
+ * @return 
+ */
     public static ResultSet getAllDevices() {
         if (ConnectionInfo.con == null) {
             ConnectionInfo.con = getDbConnection();
@@ -148,6 +151,24 @@ public class DBOperations {
 
         }
         return rs;
+    }
+    
+    public static void deRegisterDevice(String deviceId) {
+        
+        try {
+            if (ConnectionInfo.con == null) {
+                ConnectionInfo.con = getDbConnection();
+            }
+            String Updatequery = "DELETE FROM deviceinfo WHERE deviceid = ?";
+            try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
+                pstmt.setString(1, deviceId);           
+
+                pstmt.executeUpdate();
+                pstmt.close();
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
 }
