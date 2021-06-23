@@ -8,7 +8,10 @@ package com.ssamant.iotclouddemoapp;
 import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderSymmetricKey;
 import com.ssamant.connectioninfo.ConnectionInfo;
 import com.ssamant.dbservice.DBOperations;
+import com.ssamant.utilities.CheckBoxWrapperTableModel;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -71,6 +75,7 @@ public class MainForm extends javax.swing.JFrame {
         btnStopSending = new javax.swing.JButton();
         jPanelImage = new javax.swing.JPanel();
         comboBoxRegDevices = new javax.swing.JComboBox<>();
+        btnDeviceDeregister = new javax.swing.JButton();
         jPanelSendTelemetry = new javax.swing.JPanel();
         jPanelDeviceDetails = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -104,18 +109,24 @@ public class MainForm extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Device ID", "Owner", "Status", "Select"
+                "Select", "Device ID", "Owner", "Active"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, true
+                true, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
+        jTableDeviceList.setShowGrid(true);
         jScrollPaneDeviceList.setViewportView(jTableDeviceList);
+        if (jTableDeviceList.getColumnModel().getColumnCount() > 0) {
+            jTableDeviceList.getColumnModel().getColumn(0).setResizable(false);
+            jTableDeviceList.getColumnModel().getColumn(0).setPreferredWidth(2);
+            jTableDeviceList.getColumnModel().getColumn(1).setPreferredWidth(140);
+        }
 
         jLabel7.setText("Device owner:");
 
@@ -282,8 +293,15 @@ public class MainForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnStopSending)
                         .addGap(26, 26, 26)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        btnDeviceDeregister.setText("Deregister selected device(s)");
+        btnDeviceDeregister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeviceDeregisterActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelConfigParamsLayout = new javax.swing.GroupLayout(jPanelConfigParams);
         jPanelConfigParams.setLayout(jPanelConfigParamsLayout);
@@ -293,14 +311,19 @@ public class MainForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanelConfigParamsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanelConfigParamsLayout.createSequentialGroup()
+                        .addComponent(btnDeviceDeregister, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanelConfigParamsLayout.setVerticalGroup(
             jPanelConfigParamsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelConfigParamsLayout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDeviceDeregister)
+                .addGap(15, 15, 15)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         tabbedPaneMain.addTab("Register Device & Config Params", jPanelConfigParams);
@@ -439,22 +462,27 @@ public class MainForm extends javax.swing.JFrame {
 
         DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
         System.out.println("Start sending telemetry to cloud...");
-       
-        DefaultTableModel model = (DefaultTableModel) jTableDeviceList.getModel();
+
+        CheckBoxWrapperTableModel model = (CheckBoxWrapperTableModel) jTableDeviceList.getModel();
         model.setRowCount(0);
         populateTableWithdeviceIds();
     }//GEN-LAST:event_btnSendTelemetryActionPerformed
 
     private void btnStopSendingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopSendingActionPerformed
-        DeviceTelemetryService.stopSendindTelemetry(comboBoxRegDevices.getSelectedItem().toString());        
-        DefaultTableModel model = (DefaultTableModel) jTableDeviceList.getModel();
+        DeviceTelemetryService.stopSendindTelemetry(comboBoxRegDevices.getSelectedItem().toString());
+        CheckBoxWrapperTableModel model = (CheckBoxWrapperTableModel) jTableDeviceList.getModel();
         model.setRowCount(0);
         populateTableWithdeviceIds();
     }//GEN-LAST:event_btnStopSendingActionPerformed
 
-    // public static Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-    // public static Vector<String> columns = new Vector<String>();
-    // public static DefaultTableModel tableModel = new DefaultTableModel(data, columns);
+    private void btnDeviceDeregisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeviceDeregisterActionPerformed
+
+
+    }//GEN-LAST:event_btnDeviceDeregisterActionPerformed
+
+    /**
+     * function to populate the device info into table UI
+     */
     private void populateTableWithdeviceIds() {
 
         ResultSet rs = DBOperations.getAllDevices();
@@ -468,7 +496,7 @@ public class MainForm extends javax.swing.JFrame {
         }
         jTableDeviceList.setAutoCreateColumnsFromModel(false);
         DefaultTableModel tableModel = new DefaultTableModel(data, columns);
-        jTableDeviceList.setModel(tableModel);
+        //jTableDeviceList.setModel(tableModel);
 
         try {
             while (rs.next()) {
@@ -476,8 +504,33 @@ public class MainForm extends javax.swing.JFrame {
                 for (int columnIndex = 1; columnIndex <= columnCount - 1; columnIndex++) {
                     newRow.add(rs.getString(columnIndex));
                 }
+
                 tableModel.addRow(newRow);
             }
+
+            CheckBoxWrapperTableModel wrapperModel = new CheckBoxWrapperTableModel(tableModel, "Select");
+            jTableDeviceList.setModel(wrapperModel);
+
+            //code block to remove the selected rows from the table whenever one or more rows are selected and deregister button is clicked.
+            btnDeviceDeregister.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    for (int i = jTableDeviceList.getRowCount() - 1; i >= 0; i--) {
+                        Boolean selected = (Boolean) jTableDeviceList.getValueAt(i, 0);
+                        System.out.println(selected + " : " + i);
+
+                        if (selected) {
+                            int option = JOptionPane.showConfirmDialog(null, "Are you sure de-registering the selected devices?", "CONFIRM MESSAGE", JOptionPane.YES_NO_OPTION);
+                            if (option == JOptionPane.YES_OPTION) {
+                                wrapperModel.removeRow(i);
+                                //add code to deregister devices from IoT Hub and update database.
+                            } else {
+                                //simply return
+                            }
+                        }
+                    }
+                }
+            });
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -498,16 +551,21 @@ public class MainForm extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -518,6 +576,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDeviceDeregister;
     public javax.swing.JButton btnRegisterIoTDevice;
     private javax.swing.JButton btnSendTelemetry;
     private javax.swing.JButton btnStopSending;

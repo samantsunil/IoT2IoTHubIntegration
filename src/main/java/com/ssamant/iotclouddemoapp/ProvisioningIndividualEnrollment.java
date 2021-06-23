@@ -101,6 +101,7 @@ public class ProvisioningIndividualEnrollment {
                 System.out.println("IoTHUb Uri : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getIothubUri());
                 System.out.println("Device ID : " + provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
                 
+                //block to send the new device details into database
                 Device device = new Device();
                 device.setDeviceId(provisioningStatus.provisioningDeviceClientRegistrationInfoClient.getDeviceId());
                 device.setConnectionString(SYMMETRIC_KEY);
