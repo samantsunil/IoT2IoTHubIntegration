@@ -481,7 +481,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeviceDeregisterActionPerformed
 
     /**
-     * function to populate the device info into table UI
+     * function to populate the device info into table as well as deleting the selected devices from the table.
      */
     private void populateTableWithdeviceIds() {
 
@@ -512,21 +512,18 @@ public class MainForm extends javax.swing.JFrame {
             jTableDeviceList.setModel(wrapperModel);
 
             //code block to remove the selected rows from the table whenever one or more rows are selected and deregister button is clicked.
-            btnDeviceDeregister.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    for (int i = jTableDeviceList.getRowCount() - 1; i >= 0; i--) {
-                        Boolean selected = (Boolean) jTableDeviceList.getValueAt(i, 0);
-                        System.out.println(selected + " : " + i);
-
-                        if (selected) {
-                            int option = JOptionPane.showConfirmDialog(null, "Are you sure de-registering the selected devices?", "CONFIRM MESSAGE", JOptionPane.YES_NO_OPTION);
-                            if (option == JOptionPane.YES_OPTION) {
-                                wrapperModel.removeRow(i);
-                                //add code to deregister devices from IoT Hub and update database.
-                            } else {
-                                //simply return
-                            }
+            btnDeviceDeregister.addActionListener((ActionEvent e) -> {
+                for (int i = jTableDeviceList.getRowCount() - 1; i >= 0; i--) {
+                    Boolean selected = (Boolean) jTableDeviceList.getValueAt(i, 0);
+                    System.out.println(selected + " : " + i);
+                    
+                    if (selected) {
+                        int option = JOptionPane.showConfirmDialog(null, "Are you sure de-registering the selected devices?", "CONFIRM MESSAGE", JOptionPane.YES_NO_OPTION);
+                        if (option == JOptionPane.YES_OPTION) {
+                            wrapperModel.removeRow(i);
+                            //add code to deregister devices from IoT Hub and update database.
+                        } else {
+                            //simply return
                         }
                     }
                 }

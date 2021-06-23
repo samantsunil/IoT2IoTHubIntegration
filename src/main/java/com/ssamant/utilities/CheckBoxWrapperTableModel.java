@@ -10,14 +10,14 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * Wrapper built to add the check-box for each data rows of the existing table model.
  * @author Sunil
  */
 public class CheckBoxWrapperTableModel extends AbstractTableModel {
-     private ArrayList<Boolean> checkBoxes = new ArrayList<>();
+     private final ArrayList<Boolean> checkBoxes = new ArrayList<>();
 
-    private DefaultTableModel model;
-    private String columnName;
+    private final DefaultTableModel model;
+    private final String columnName;
 
     public CheckBoxWrapperTableModel(DefaultTableModel model, String columnName)
     {
@@ -79,7 +79,7 @@ public class CheckBoxWrapperTableModel extends AbstractTableModel {
 
         fireTableCellUpdated(row, column);
     }
-    
+    //method to refresh the content of the table by setting the row content to zero.
      public void setRowCount(int rowCount)
      {
         model.setRowCount(0);
