@@ -82,6 +82,8 @@ public class MainForm extends javax.swing.JFrame {
         comboBoxRegDevices = new javax.swing.JComboBox<>();
         btnDeviceDeregister = new javax.swing.JButton();
         jPanelSendTelemetry = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtAreaConsoleOutput = new javax.swing.JTextArea();
         jPanelDeviceDetails = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableDeviceInfo = new javax.swing.JTable();
@@ -350,15 +352,27 @@ public class MainForm extends javax.swing.JFrame {
 
         tabbedPaneMain.addTab("Register Device & Config Params", jPanelConfigParams);
 
+        jScrollPane2.setAutoscrolls(true);
+
+        txtAreaConsoleOutput.setColumns(20);
+        txtAreaConsoleOutput.setRows(5);
+        jScrollPane2.setViewportView(txtAreaConsoleOutput);
+
         javax.swing.GroupLayout jPanelSendTelemetryLayout = new javax.swing.GroupLayout(jPanelSendTelemetry);
         jPanelSendTelemetry.setLayout(jPanelSendTelemetryLayout);
         jPanelSendTelemetryLayout.setHorizontalGroup(
             jPanelSendTelemetryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1178, Short.MAX_VALUE)
+            .addGroup(jPanelSendTelemetryLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1158, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanelSendTelemetryLayout.setVerticalGroup(
             jPanelSendTelemetryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 577, Short.MAX_VALUE)
+            .addGroup(jPanelSendTelemetryLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(106, Short.MAX_VALUE))
         );
 
         tabbedPaneMain.addTab("View Results", jPanelSendTelemetry);
@@ -523,6 +537,7 @@ public class MainForm extends javax.swing.JFrame {
      */
     private void btnSendTelemetryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendTelemetryActionPerformed
 
+        txtAreaConsoleOutput.setText(null);
         lblSendStopMsg.setText("");
         String deviceId = comboBoxRegDevices.getSelectedItem().toString();
         String transportProtocol = comboBoxMsgProtocols.getSelectedItem().toString();
@@ -732,12 +747,14 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelImage;
     public javax.swing.JPanel jPanelSendTelemetry;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPaneDeviceList;
     private javax.swing.JTable jTableDeviceList;
     public javax.swing.JLabel labelDeviceRegSuccess;
     private javax.swing.JLabel lblSendStopMsg;
     private javax.swing.JTabbedPane tabbedPaneMain;
     private javax.swing.JTable tableDeviceInfo;
+    public static javax.swing.JTextArea txtAreaConsoleOutput;
     private javax.swing.JTextField txtFieldDeviceOwner;
     private javax.swing.JTextField txtFieldDuration;
     private javax.swing.JTextField txtFieldMsgSize;

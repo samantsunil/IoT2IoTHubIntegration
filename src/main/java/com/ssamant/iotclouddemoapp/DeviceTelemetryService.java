@@ -19,6 +19,8 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -48,8 +50,8 @@ public class DeviceTelemetryService {
         public String deviceId;
         public double temperature;
         public double humidity;
-        public double latitude;
-        public double longitude;
+        public double lat;
+        public double longi;
         public String pointInfo;
 
         // Serialize object to JSON format.
@@ -141,6 +143,7 @@ public class DeviceTelemetryService {
                 double sensorLocLong = 144.946457f;
 
                 Random rand = new Random();
+                DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
                 while (true) {
                     // Simulate telemetry.
                     double currentTemperature = minTemperature + rand.nextDouble() * 15;
@@ -164,8 +167,8 @@ public class DeviceTelemetryService {
                     TelemetryDataPoint telemetryDataPoint = new TelemetryDataPoint();
                     telemetryDataPoint.temperature = currentTemperature;
                     telemetryDataPoint.humidity = currentHumidity;
-                    telemetryDataPoint.latitude = sensorLocLat;
-                    telemetryDataPoint.longitude = sensorLocLong;
+                    telemetryDataPoint.lat = sensorLocLat;
+                    telemetryDataPoint.longi = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
                     telemetryDataPoint.pointInfo = infoString;
                     // Add the telemetry to the message body as JSON.
@@ -178,7 +181,8 @@ public class DeviceTelemetryService {
                     msg.setProperty("level", levelValue);
                     msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
                     //System.out.println("Sending message: " + msgStr);
-                    System.out.println(String.format("%s > Message: %s", LocalDateTime.now(), msgStr));
+                    System.out.println(String.format("%s > Message: %s", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf), msgStr));
+                    MainForm.txtAreaConsoleOutput.append(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf) + " > Message: " + msgStr + "\n");
                     Object lockobj = new Object();
                     // msg.getBytes();
                     System.out.println("Message Size: " + RamUsageEstimator.sizeOf(msg.getBytes()));
@@ -211,12 +215,14 @@ public class DeviceTelemetryService {
         @Override
         public void run() {
             try {
-            while (true) {
-                byte[] msgSize = new byte[200];
-                String msgStr = Arrays.toString(msgSize);
-                 Message msg = new Message(msgStr);
-                 msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
-                 System.out.println(String.format("%s > Message: %s", LocalDateTime.now(), msgStr));
+                DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+                while (true) {
+                    byte[] msgSize = new byte[200];
+                    String msgStr = Arrays.toString(msgSize);
+                    Message msg = new Message(msgStr);
+                    msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
+                    System.out.println(String.format("%s > Message: %s", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf), msgStr));
+                    MainForm.txtAreaConsoleOutput.append(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf) + " > Message: " + msgStr + "\n");
                     Object lockobj = new Object();
                     // msg.getBytes();
                     System.out.println("Message Size: " + RamUsageEstimator.sizeOf(msg.getBytes()));
@@ -228,16 +234,15 @@ public class DeviceTelemetryService {
                         lockobj.wait();
                     }
                     Thread.sleep(interval);
-            }
-            }
-            catch (InterruptedException e) {
+                }
+            } catch (InterruptedException e) {
                 System.out.println("Finished.");
                 System.out.println(e.getMessage());
             }
-            
-            }
+
         }
-    
+    }
+
     /**
      * method to open the IoT Hub client connection for the selected device
      * (deviceId) and calls the message sender class in executor thread, that
@@ -260,7 +265,7 @@ public class DeviceTelemetryService {
             client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
             // Create new thread and start sending messages
             MessageSender sender = new MessageSender();
-           //FixedSizeMessageSender sender = new FixedSizeMessageSender();
+            //FixedSizeMessageSender sender = new FixedSizeMessageSender();
             ExecutorService executor = Executors.newFixedThreadPool(1);
 
             executor.execute(sender);
@@ -274,6 +279,7 @@ public class DeviceTelemetryService {
             executor.shutdownNow();
             client.closeNow();
             stopSendindTelemetry(device.getDeviceId());
+            MainForm.txtAreaConsoleOutput.append("Finished sending telemetry.");
         } catch (URISyntaxException | IllegalArgumentException ex) {
             System.out.println("Error occured while conneting to IoT Hub: " + ex.getMessage());
         }
