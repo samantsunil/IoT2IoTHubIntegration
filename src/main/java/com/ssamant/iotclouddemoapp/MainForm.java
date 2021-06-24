@@ -18,6 +18,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -453,19 +455,46 @@ public class MainForm extends javax.swing.JFrame {
         String telemInterval = txtFieldTelemFrequency.getText().trim();
         String msgSize = txtFieldMsgSize.getText().trim();
         int duration = Integer.parseInt(txtFieldDuration.getText().trim());
+        String[] devConnInfo = DBOperations.getDeviceConnInfo(deviceId);
+        if ("".equals(devConnInfo[0])) {
+            System.out.println("The selected device is currently sending telemetry or some issue occurred");
+            return;
+
+        }
 
         Device device = new Device();
         device.setMessageSize(msgSize);
         device.setDeviceId(deviceId);
         device.setProtocol(transportProtocol);
         device.setTelemInterval(telemInterval);
+        device.setConnectionString(devConnInfo[0]);
+        device.setIotHubUri(devConnInfo[1]);
 
-        DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
         System.out.println("Start sending telemetry to cloud...");
-
+        DBOperations.dbUpdateDeviceInfo(device, true);
         CheckBoxWrapperTableModel model = (CheckBoxWrapperTableModel) jTableDeviceList.getModel();
         model.setRowCount(0);
-        populateTableWithdeviceIds();
+        ExecutorService service = Executors.newFixedThreadPool(1);
+        service.submit(() -> {
+
+            populateTableWithdeviceIds();
+        });
+
+       // populateTableWithdeviceIds();
+
+        int success = DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
+
+        if (success == 0) {
+            DBOperations.dbUpdateDeviceInfo(device, false);
+            model.setRowCount(0);
+            populateTableWithdeviceIds();
+        }
+        if (success == 1) {
+            DBOperations.dbUpdateDeviceInfo(device, false);
+            model.setRowCount(0);
+            populateTableWithdeviceIds();
+        }
+
     }//GEN-LAST:event_btnSendTelemetryActionPerformed
 
     private void btnStopSendingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopSendingActionPerformed
@@ -479,6 +508,14 @@ public class MainForm extends javax.swing.JFrame {
 
 
     }//GEN-LAST:event_btnDeviceDeregisterActionPerformed
+
+    private static class UpdateTableRows implements Runnable {
+
+        @Override
+        public void run() {
+
+        }
+    }
 
     /**
      * function to populate the device info into table as well as deleting the

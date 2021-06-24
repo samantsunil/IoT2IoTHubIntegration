@@ -5,6 +5,7 @@
  */
 package com.ssamant.iotclouddemoapp;
 
+import com.carrotsearch.sizeof.RamUsageEstimator;
 import com.google.gson.Gson;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.DeviceMethodCallback;
@@ -88,6 +89,9 @@ public class DeviceTelemetryService {
         }
     }
 
+    /**
+     * callback method - to receive message from the cloud.
+     */
     protected static class DirectMethodCallback implements DeviceMethodCallback {
 
         private void setTelemetryInterval(int val) {
@@ -128,13 +132,12 @@ public class DeviceTelemetryService {
         @Override
         public void run() {
             try {
-                // Initialize the simulated telemetry.
+                // Initialize the simulated telemetry data.
                 double minTemperature = 20;
                 double minHumidity = 60;
                 double sensorLocLat = -37.840935f;
                 double sensorLocLong = 144.946457f;
                 Random rand = new Random();
-                long startTime = System.currentTimeMillis();
                 while (true) {
                     // Simulate telemetry.
                     double currentTemperature = minTemperature + rand.nextDouble() * 15;
@@ -145,14 +148,14 @@ public class DeviceTelemetryService {
                     if (rand.nextDouble() > 0.7) {
                         if (rand.nextDouble() > 0.5) {
                             levelValue = "critical";
-                            infoString = "This is a critical messgae as alert!";
+                            infoString = "Critical message delivered as alert!";
                         } else {
                             levelValue = "storage";
-                            infoString = "This is a storage message.";
+                            infoString = "Message sent to storage.";
                         }
                     } else {
                         levelValue = "normal";
-                        infoString = "This is a normal message - processed in real-time.";
+                        infoString = "Normal message - delivered to real-time processing.";
                     }
 
                     TelemetryDataPoint telemetryDataPoint = new TelemetryDataPoint();
@@ -171,9 +174,10 @@ public class DeviceTelemetryService {
                     //msg.setProperty("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
                     msg.setProperty("level", levelValue);
                     //System.out.println("Sending message: " + msgStr);
-                    System.out.println(String.format("%s > Sent message: %s", LocalDateTime.now(), msgStr));
+                    System.out.println(String.format("%s > Message: %s", LocalDateTime.now(), msgStr));
                     Object lockobj = new Object();
-
+                    // msg.getBytes();
+                    System.out.println(RamUsageEstimator.sizeOf(msg.getBytes()));
                     // Send the message.
                     EventCallback callback = new EventCallback();
                     client.sendEventAsync(msg, callback, lockobj);
@@ -190,42 +194,45 @@ public class DeviceTelemetryService {
         }
     }
 
-    public static void SendTelemetry(String conString, IotHubClientProtocol msgProtocol) throws IOException {
+    public static void SendTelemetry(Device device, IotHubClientProtocol msgProtocol) throws IOException {
 
         try {
-            client = new DeviceClient(conString, msgProtocol);
+            //String conString = "HostName=" + device.getIotHubUri() + ";DeviceId=" + device.getDeviceId() + "; SharedAccessKey=" + device.getConnectionString();
+            String conStr = "HostName=iotcloudintegration.azure-devices.net;DeviceId=demo-device-symm-key-001;SharedAccessKey=pkrpdAk4Qvn7sd4bNAxldkXcwMpXo+PBOyWoiWueEe3iMkPw1Feleg8rns4oyIGV1lEnSDACGkwgpQqsf+eUdA==";
+            client = new DeviceClient(conStr, msgProtocol);
             client.open();
+             //
+            
+            // Register to receive direct method calls.
+            client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
+            // Create new thread and start sending messages
+            MessageSender sender = new MessageSender();
+            ExecutorService executor = Executors.newFixedThreadPool(1);
+            
+            executor.execute(sender);
+            // Stop the application.
+            System.out.println("Finished sending telemetry");
+            //System.in.read();
+            long startTime = System.currentTimeMillis();
+            while (false || (System.currentTimeMillis() - startTime) < duration * 60000) {
+                //stay until send duration....
+            }
+            executor.shutdownNow();
+            client.closeNow();
+            stopSendindTelemetry(device.getDeviceId());
         } catch (URISyntaxException | IllegalArgumentException ex) {
-            System.out.println("Error connecting to IoT Hub: " + ex.getMessage());
+            System.out.println("Error occured while conneting to IoT Hub: " + ex.getMessage());
         }
-
-        // Register to receive direct method calls.
-        client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
-        // Create new thread and start sending messages 
-        MessageSender sender = new MessageSender();
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-
-        executor.execute(sender);
-        // Stop the application.
-        System.out.println("Finished sending telemetry");
-        //System.in.read();
-        long startTime = System.currentTimeMillis();
-        while (false || (System.currentTimeMillis() - startTime) < duration * 60000) {
-           //stay until send duration....
-        }
-        executor.shutdownNow();
-        client.closeNow();
 
     }
 
-    public static void sendDeviceTelemetryToCloud(Device device, int sendDuration) {
-
+    public static int sendDeviceTelemetryToCloud(Device device, int sendDuration) {
+          int retVal = 0;
         try {
-            DBOperations.dbUpdateDeviceInfo(device, true);
+
             duration = sendDuration;
             devID = device.getDeviceId();
-            interval = Integer.parseInt(device.getTelemInterval());
-            String conString = device.getConnectionString();
+            interval = Integer.parseInt(device.getTelemInterval());            
             IotHubClientProtocol msgProtocol = null;
             if ("AMQP".equals(device.getProtocol())) {
                 msgProtocol = IotHubClientProtocol.AMQPS;
@@ -233,16 +240,29 @@ public class DeviceTelemetryService {
                 msgProtocol = IotHubClientProtocol.MQTT;
             } else {
                 System.out.println("Invalid transport protocol!");
-                return;
+                return 0;
             }
-            SendTelemetry("HostName=iotcloudintegration.azure-devices.net;DeviceId=demo-device-symm-key-001;SharedAccessKey=pkrpdAk4Qvn7sd4bNAxldkXcwMpXo+PBOyWoiWueEe3iMkPw1Feleg8rns4oyIGV1lEnSDACGkwgpQqsf+eUdA==", msgProtocol);
+            SendTelemetry(device, msgProtocol);
+            retVal = 1;
+
         } catch (IOException ex) {
             System.out.println("Error while sending telemetry: " + ex.getMessage());
+            
         }
+        return retVal;
     }
 
     public static void stopSendindTelemetry(String deviceId) {
         DBOperations.updateDeviceStatus(deviceId, false);
+        try {
+            if(client!=null){
+            client.closeNow();
+            }
+        } catch (IOException ex) {
+            
+            System.out.println("Telemtry sending from the selected device is stopped: " + ex.getMessage());
+        }
+        
     }
 
 }

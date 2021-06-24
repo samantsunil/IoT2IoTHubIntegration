@@ -125,22 +125,26 @@ public class DBOperations {
                 String deviceId = rs.getString("deviceid");
                 deviceList.add(deviceId);
             }
+            rs.close();
 
         } catch (SQLException ex) {
 
         }
         return deviceList;
     }
-/**
- * method to obtain device info, such as device id, deviceowner and active status.
- * @return 
- */
+
+    /**
+     * method to obtain device info, such as device id, deviceowner and active
+     * status.
+     *
+     * @return
+     */
     public static ResultSet getAllDevices() {
         if (ConnectionInfo.con == null) {
             ConnectionInfo.con = getDbConnection();
         }
         ResultSet rs = null;
-        String qry = "SELECT deviceid, deviceowner, active from deviceinfo";
+        String qry = "SELECT deviceid, deviceowner, active FROM deviceinfo";
         try {
             Statement stm;
             stm = ConnectionInfo.con.createStatement();
@@ -152,16 +156,44 @@ public class DBOperations {
         }
         return rs;
     }
-    
+
+    public static String[] getDeviceConnInfo(String deviceId) {
+
+        if (ConnectionInfo.con == null) {
+            ConnectionInfo.con = getDbConnection();
+        }
+
+        String[] devConnInfo = new String[2];       
+        ResultSet rs = null;
+        String qry = "SELECT connectionstring, iothuburi FROM deviceinfo WHERE deviceId = ? AND active = ?";
+        try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(qry)) {
+            pstmt.setString(1, deviceId);
+            pstmt.setBoolean(2, false);
+
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String constr = rs.getString("connectionstring");
+                String huburi = rs.getString("iothuburi");
+                devConnInfo[0] = constr;
+                devConnInfo[1] = huburi;
+            }
+            rs.close();
+
+        } catch (SQLException ex) {
+
+        }
+        return devConnInfo;
+    }
+
     public static void deRegisterDevice(String deviceId) {
-        
+
         try {
             if (ConnectionInfo.con == null) {
                 ConnectionInfo.con = getDbConnection();
             }
             String Updatequery = "DELETE FROM deviceinfo WHERE deviceid = ?";
             try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
-                pstmt.setString(1, deviceId);           
+                pstmt.setString(1, deviceId);
 
                 pstmt.executeUpdate();
                 pstmt.close();
