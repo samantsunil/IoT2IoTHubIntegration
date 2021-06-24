@@ -40,6 +40,7 @@ public class MainForm extends javax.swing.JFrame {
         initComponents();
         ((JLabel) comboBoxMsgProtocols.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         ((JLabel) comboBoxRegDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+        ((JLabel) jComboBoxActiveDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         populateAllDevices(); //populate existing IoT devices into combo box.
         populateTableWithdeviceIds();
     }
@@ -84,6 +85,13 @@ public class MainForm extends javax.swing.JFrame {
         jPanelDeviceDetails = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableDeviceInfo = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jComboBoxActiveDevices = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
+        txtFieldSetTelemInterval = new javax.swing.JTextField();
+        btnUpdateTelemInterval = new javax.swing.JButton();
+        btnReadMesssages = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("IoT Device to Cloud Telemetry Demo [Azure cloud]");
@@ -394,6 +402,59 @@ public class MainForm extends javax.swing.JFrame {
 
         tabbedPaneMain.addTab("View Device Details", jPanelDeviceDetails);
 
+        jLabel8.setText("Select a device:");
+
+        jComboBoxActiveDevices.setAutoscrolls(true);
+
+        jLabel9.setText("Update Telemetry Interval (seconds):");
+
+        txtFieldSetTelemInterval.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        btnUpdateTelemInterval.setText("Update Interval");
+
+        btnReadMesssages.setText("Read Messages");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(btnReadMesssages, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 171, Short.MAX_VALUE)
+                        .addComponent(btnUpdateTelemInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(22, 22, 22)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jComboBoxActiveDevices, 0, 321, Short.MAX_VALUE)
+                            .addComponent(txtFieldSetTelemInterval))))
+                .addContainerGap(584, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(73, 73, 73)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(jComboBoxActiveDevices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(41, 41, 41)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txtFieldSetTelemInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(32, 32, 32)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnReadMesssages)
+                    .addComponent(btnUpdateTelemInterval))
+                .addContainerGap(366, Short.MAX_VALUE))
+        );
+
+        tabbedPaneMain.addTab("Read Message & Control Device", jPanel3);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -646,11 +707,14 @@ public class MainForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDeviceDeregister;
+    private javax.swing.JButton btnReadMesssages;
     public javax.swing.JButton btnRegisterIoTDevice;
     private javax.swing.JButton btnSendTelemetry;
     public javax.swing.JButton btnStopSending;
+    private javax.swing.JButton btnUpdateTelemInterval;
     private javax.swing.JComboBox<String> comboBoxMsgProtocols;
     private javax.swing.JComboBox<String> comboBoxRegDevices;
+    private javax.swing.JComboBox<String> jComboBoxActiveDevices;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -658,8 +722,11 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     public javax.swing.JPanel jPanelConfigParams;
     public javax.swing.JPanel jPanelDeviceDetails;
     private javax.swing.JPanel jPanelImage;
@@ -675,6 +742,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JTextField txtFieldDuration;
     private javax.swing.JTextField txtFieldMsgSize;
     private javax.swing.JTextField txtFieldNumDevices;
+    private javax.swing.JTextField txtFieldSetTelemInterval;
     private javax.swing.JTextField txtFieldTelemFrequency;
     // End of variables declaration//GEN-END:variables
 }
