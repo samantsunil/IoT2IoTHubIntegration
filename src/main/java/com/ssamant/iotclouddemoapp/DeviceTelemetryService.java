@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +36,7 @@ public class DeviceTelemetryService {
     private static final int METHOD_SUCCESS = 200;
     private static final int METHOD_NOT_DEFINED = 404;
     private static final int INVALID_PARAMETER = 400;
+    private static final int D2C_MESSAGE_TIMEOUT = 2000;
     private static int duration = 0;
     private static int interval = 0;
     private static DeviceClient client;
@@ -137,6 +139,7 @@ public class DeviceTelemetryService {
                 double minHumidity = 60;
                 double sensorLocLat = -37.840935f;
                 double sensorLocLong = 144.946457f;
+
                 Random rand = new Random();
                 while (true) {
                     // Simulate telemetry.
@@ -173,11 +176,12 @@ public class DeviceTelemetryService {
                     // An IoT hub can filter on these properties without access to the message body.
                     //msg.setProperty("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
                     msg.setProperty("level", levelValue);
+                    msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
                     //System.out.println("Sending message: " + msgStr);
                     System.out.println(String.format("%s > Message: %s", LocalDateTime.now(), msgStr));
                     Object lockobj = new Object();
                     // msg.getBytes();
-                    System.out.println(RamUsageEstimator.sizeOf(msg.getBytes()));
+                    System.out.println("Message Size: " + RamUsageEstimator.sizeOf(msg.getBytes()));
                     // Send the message.
                     EventCallback callback = new EventCallback();
                     client.sendEventAsync(msg, callback, lockobj);
@@ -194,6 +198,46 @@ public class DeviceTelemetryService {
         }
     }
 
+    private static String createDataSize(int msgSize) {
+        StringBuilder sb = new StringBuilder(msgSize);
+        for (int i = 0; i < msgSize; i++) {
+            sb.append('a');
+        }
+        return sb.toString();
+    }
+
+    private static class FixedSizeMessageSender implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+            while (true) {
+                byte[] msgSize = new byte[200];
+                String msgStr = Arrays.toString(msgSize);
+                 Message msg = new Message(msgStr);
+                 msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
+                 System.out.println(String.format("%s > Message: %s", LocalDateTime.now(), msgStr));
+                    Object lockobj = new Object();
+                    // msg.getBytes();
+                    System.out.println("Message Size: " + RamUsageEstimator.sizeOf(msg.getBytes()));
+                    // Send the message.
+                    EventCallback callback = new EventCallback();
+                    client.sendEventAsync(msg, callback, lockobj);
+
+                    synchronized (lockobj) {
+                        lockobj.wait();
+                    }
+                    Thread.sleep(interval);
+            }
+            }
+            catch (InterruptedException e) {
+                System.out.println("Finished.");
+                System.out.println(e.getMessage());
+            }
+            
+            }
+        }
+    
     /**
      * method to open the IoT Hub client connection for the selected device
      * (deviceId) and calls the message sender class in executor thread, that
@@ -216,6 +260,7 @@ public class DeviceTelemetryService {
             client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
             // Create new thread and start sending messages
             MessageSender sender = new MessageSender();
+           //FixedSizeMessageSender sender = new FixedSizeMessageSender();
             ExecutorService executor = Executors.newFixedThreadPool(1);
 
             executor.execute(sender);
