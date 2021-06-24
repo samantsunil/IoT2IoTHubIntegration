@@ -127,6 +127,14 @@ public class DeviceTelemetryService {
         }
     }
 
+    /**
+     * method runs inside the runnable thread process. It prepared the sample
+     * device data and calls async message send method for IoT Hub device
+     * client. The method listens for any message senb by the IoT Hub through
+     * DirectMethod callback. The direct method callback is implemented to
+     * listen for any updated value of telemetry send interval and accordingly
+     * update the telemetry interval value.
+     */
     private static class MessageSender implements Runnable {
 
         @Override
@@ -194,21 +202,30 @@ public class DeviceTelemetryService {
         }
     }
 
+    /**
+     * method to open the IoT Hub client connection for the selected device
+     * (deviceId) and calls the message sender class in executor thread, that
+     * implements the statements for message sending.
+     *
+     * @param device
+     * @param msgProtocol
+     * @throws IOException
+     */
     public static void SendTelemetry(Device device, IotHubClientProtocol msgProtocol) throws IOException {
 
         try {
-            //String conString = "HostName=" + device.getIotHubUri() + ";DeviceId=" + device.getDeviceId() + "; SharedAccessKey=" + device.getConnectionString();
-            String conStr = "HostName=iotcloudintegration.azure-devices.net;DeviceId=demo-device-symm-key-001;SharedAccessKey=pkrpdAk4Qvn7sd4bNAxldkXcwMpXo+PBOyWoiWueEe3iMkPw1Feleg8rns4oyIGV1lEnSDACGkwgpQqsf+eUdA==";
+            String conStr = "HostName=" + device.getIotHubUri().trim() + ";DeviceId=" + device.getDeviceId().trim() + ";SharedAccessKey=" + device.getConnectionString().trim();
+
             client = new DeviceClient(conStr, msgProtocol);
             client.open();
-             //
-            
+            //
+
             // Register to receive direct method calls.
             client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
             // Create new thread and start sending messages
             MessageSender sender = new MessageSender();
             ExecutorService executor = Executors.newFixedThreadPool(1);
-            
+
             executor.execute(sender);
             // Stop the application.
             System.out.println("Finished sending telemetry");
@@ -227,12 +244,12 @@ public class DeviceTelemetryService {
     }
 
     public static int sendDeviceTelemetryToCloud(Device device, int sendDuration) {
-          int retVal = 0;
+        int retVal = 0;
         try {
 
             duration = sendDuration;
             devID = device.getDeviceId();
-            interval = Integer.parseInt(device.getTelemInterval());            
+            interval = Integer.parseInt(device.getTelemInterval());
             IotHubClientProtocol msgProtocol = null;
             if ("AMQP".equals(device.getProtocol())) {
                 msgProtocol = IotHubClientProtocol.AMQPS;
@@ -247,22 +264,30 @@ public class DeviceTelemetryService {
 
         } catch (IOException ex) {
             System.out.println("Error while sending telemetry: " + ex.getMessage());
-            
+
         }
         return retVal;
     }
 
+    /**
+     * method to stop the telemetry sending forcefully while the device is
+     * currently sending message to cloud. It terminates the IoT Hub client
+     * connection for the device.
+     *
+     * @param deviceId
+     */
     public static void stopSendindTelemetry(String deviceId) {
         DBOperations.updateDeviceStatus(deviceId, false);
         try {
-            if(client!=null){
-            client.closeNow();
+            if (client != null) {
+                client.closeNow();
+
             }
         } catch (IOException ex) {
-            
+
             System.out.println("Telemtry sending from the selected device is stopped: " + ex.getMessage());
         }
-        
+
     }
 
 }

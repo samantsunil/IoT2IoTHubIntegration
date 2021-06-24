@@ -20,6 +20,7 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -76,6 +77,7 @@ public class MainForm extends javax.swing.JFrame {
         btnSendTelemetry = new javax.swing.JButton();
         btnStopSending = new javax.swing.JButton();
         jPanelImage = new javax.swing.JPanel();
+        lblSendStopMsg = new javax.swing.JLabel();
         comboBoxRegDevices = new javax.swing.JComboBox<>();
         btnDeviceDeregister = new javax.swing.JButton();
         jPanelSendTelemetry = new javax.swing.JPanel();
@@ -181,7 +183,7 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(txtFieldDeviceOwner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnRegisterIoTDevice))))
                 .addGap(25, 25, 25)
-                .addComponent(jScrollPaneDeviceList, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE))
+                .addComponent(jScrollPaneDeviceList, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -223,15 +225,24 @@ public class MainForm extends javax.swing.JFrame {
 
         jPanelImage.setBackground(new java.awt.Color(204, 255, 255));
 
+        lblSendStopMsg.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblSendStopMsg.setAutoscrolls(true);
+
         javax.swing.GroupLayout jPanelImageLayout = new javax.swing.GroupLayout(jPanelImage);
         jPanelImage.setLayout(jPanelImageLayout);
         jPanelImageLayout.setHorizontalGroup(
             jPanelImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 256, Short.MAX_VALUE)
+            .addGroup(jPanelImageLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblSendStopMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(177, Short.MAX_VALUE))
         );
         jPanelImageLayout.setVerticalGroup(
             jPanelImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 273, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelImageLayout.createSequentialGroup()
+                .addContainerGap(199, Short.MAX_VALUE)
+                .addComponent(lblSendStopMsg)
+                .addGap(60, 60, 60))
         );
 
         comboBoxRegDevices.setAutoscrolls(true);
@@ -258,7 +269,7 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(btnSendTelemetry, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(comboBoxRegDevices, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(btnStopSending, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(68, 68, 68)
+                .addGap(18, 18, 18)
                 .addComponent(jPanelImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -334,11 +345,11 @@ public class MainForm extends javax.swing.JFrame {
         jPanelSendTelemetry.setLayout(jPanelSendTelemetryLayout);
         jPanelSendTelemetryLayout.setHorizontalGroup(
             jPanelSendTelemetryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 970, Short.MAX_VALUE)
+            .addGap(0, 1178, Short.MAX_VALUE)
         );
         jPanelSendTelemetryLayout.setVerticalGroup(
             jPanelSendTelemetryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 543, Short.MAX_VALUE)
+            .addGap(0, 577, Short.MAX_VALUE)
         );
 
         tabbedPaneMain.addTab("View Results", jPanelSendTelemetry);
@@ -370,7 +381,7 @@ public class MainForm extends javax.swing.JFrame {
             jPanelDeviceDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelDeviceDetailsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 950, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1158, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanelDeviceDetailsLayout.setVerticalGroup(
@@ -450,6 +461,7 @@ public class MainForm extends javax.swing.JFrame {
      */
     private void btnSendTelemetryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendTelemetryActionPerformed
 
+        lblSendStopMsg.setText("");
         String deviceId = comboBoxRegDevices.getSelectedItem().toString();
         String transportProtocol = comboBoxMsgProtocols.getSelectedItem().toString();
         String telemInterval = txtFieldTelemFrequency.getText().trim();
@@ -459,7 +471,6 @@ public class MainForm extends javax.swing.JFrame {
         if ("".equals(devConnInfo[0])) {
             System.out.println("The selected device is currently sending telemetry or some issue occurred");
             return;
-
         }
 
         Device device = new Device();
@@ -471,51 +482,61 @@ public class MainForm extends javax.swing.JFrame {
         device.setIotHubUri(devConnInfo[1]);
 
         System.out.println("Start sending telemetry to cloud...");
+        lblSendStopMsg.setText("Start sending telemetry to cloud...");
         DBOperations.dbUpdateDeviceInfo(device, true);
         CheckBoxWrapperTableModel model = (CheckBoxWrapperTableModel) jTableDeviceList.getModel();
         model.setRowCount(0);
-        ExecutorService service = Executors.newFixedThreadPool(1);
-        service.submit(() -> {
+//        ExecutorService service = Executors.newFixedThreadPool(1);
+//        service.submit(() -> {
+//
+//            populateTableWithdeviceIds();
+//        });
 
-            populateTableWithdeviceIds();
+        populateTableWithdeviceIds();
+        // int success = DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
+        int success = 0;
+        ExecutorService teleService = Executors.newFixedThreadPool(1);
+        teleService.submit(new Runnable() {
+            @Override
+            public void run() {
+                DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
+                lblSendStopMsg.setText("Finished telemetry sending operation for the defined duration.");
+                model.setRowCount(0);
+                populateTableWithdeviceIds();
+            }
         });
-
-       // populateTableWithdeviceIds();
-
-        int success = DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
-
-        if (success == 0) {
-            DBOperations.dbUpdateDeviceInfo(device, false);
-            model.setRowCount(0);
-            populateTableWithdeviceIds();
-        }
-        if (success == 1) {
-            DBOperations.dbUpdateDeviceInfo(device, false);
-            model.setRowCount(0);
-            populateTableWithdeviceIds();
-        }
-
     }//GEN-LAST:event_btnSendTelemetryActionPerformed
 
+    public static void refreshTableData(int val) {
+
+    }
     private void btnStopSendingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopSendingActionPerformed
-        DeviceTelemetryService.stopSendindTelemetry(comboBoxRegDevices.getSelectedItem().toString());
-        CheckBoxWrapperTableModel model = (CheckBoxWrapperTableModel) jTableDeviceList.getModel();
-        model.setRowCount(0);
-        populateTableWithdeviceIds();
+
+        Boolean isActive = DBOperations.isDeviceActive(comboBoxRegDevices.getSelectedItem().toString().trim());
+        int option;
+        if (isActive) {
+            option = JOptionPane.showConfirmDialog(null, "Are you sure to stop sending telemetry from the selected device?", "CONFIRM MESSAGE", JOptionPane.YES_NO_OPTION);
+
+            if (option == JOptionPane.YES_OPTION) {
+
+                DeviceTelemetryService.stopSendindTelemetry(comboBoxRegDevices.getSelectedItem().toString());
+                CheckBoxWrapperTableModel model = (CheckBoxWrapperTableModel) jTableDeviceList.getModel();
+                model.setRowCount(0);
+                populateTableWithdeviceIds();
+                lblSendStopMsg.setText("Telemetry sending stopped for the selected device.");
+            }
+        }
+        
+        else {
+            System.out.println("Device is currently not sending message to cloud...");
+            lblSendStopMsg.setText("The selected device is not sending telemetry to cloud...");
+        }
     }//GEN-LAST:event_btnStopSendingActionPerformed
 
     private void btnDeviceDeregisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeviceDeregisterActionPerformed
 
 
     }//GEN-LAST:event_btnDeviceDeregisterActionPerformed
-
-    private static class UpdateTableRows implements Runnable {
-
-        @Override
-        public void run() {
-
-        }
-    }
 
     /**
      * function to populate the device info into table as well as deleting the
@@ -646,6 +667,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPaneDeviceList;
     private javax.swing.JTable jTableDeviceList;
     public javax.swing.JLabel labelDeviceRegSuccess;
+    private javax.swing.JLabel lblSendStopMsg;
     private javax.swing.JTabbedPane tabbedPaneMain;
     private javax.swing.JTable tableDeviceInfo;
     private javax.swing.JTextField txtFieldDeviceOwner;

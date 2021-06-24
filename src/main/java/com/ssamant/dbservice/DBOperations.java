@@ -76,10 +76,6 @@ public class DBOperations {
 
     }
 
-    public static void getDeviceConnectionInfo(String deviceId) {
-
-    }
-
     /**
      * function to update the device telemetry send status - active or idle.
      *
@@ -183,6 +179,27 @@ public class DBOperations {
 
         }
         return devConnInfo;
+    }
+    
+    public static Boolean isDeviceActive(String deviceId) {
+        if (ConnectionInfo.con == null) {
+            ConnectionInfo.con = getDbConnection();
+        }
+        Boolean isActive = false;             
+        ResultSet rs = null;
+        String qry = "SELECT active FROM deviceinfo WHERE deviceId = ?";
+        try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(qry)) {
+            pstmt.setString(1, deviceId);           
+
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                isActive = rs.getBoolean("active");            }
+            rs.close();
+
+        } catch (SQLException ex) {
+         System.out.println(ex.getMessage());
+        }
+        return isActive;
     }
 
     public static void deRegisterDevice(String deviceId) {
