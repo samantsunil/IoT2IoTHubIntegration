@@ -41,14 +41,6 @@ public class DeviceTelemetryService {
 
     private static String devID = "";
 
-    private static class IotHubEventCallbackImpl implements IotHubEventCallback {
-
-        @Override
-        public void execute(IotHubStatusCode responseStatus, Object callbackContext) {
-            System.out.println("Message received! Response status: " + responseStatus);
-        }
-    }
-
     private static class TelemetryDataPoint {
 
         public String deviceId;
@@ -130,7 +122,7 @@ public class DeviceTelemetryService {
     /**
      * method runs inside the runnable thread process. It prepared the sample
      * device data and calls async message send method for IoT Hub device
-     * client. The method listens for any message senb by the IoT Hub through
+     * client. The method listens for any message send by the IoT Hub through
      * DirectMethod callback. The direct method callback is implemented to
      * listen for any updated value of telemetry send interval and accordingly
      * update the telemetry interval value.
@@ -232,7 +224,7 @@ public class DeviceTelemetryService {
             //System.in.read();
             long startTime = System.currentTimeMillis();
             while (false || (System.currentTimeMillis() - startTime) < duration * 60000) {
-                //stay until send duration....
+                //keep sending until the send duration completed ( in minutes )....
             }
             executor.shutdownNow();
             client.closeNow();
