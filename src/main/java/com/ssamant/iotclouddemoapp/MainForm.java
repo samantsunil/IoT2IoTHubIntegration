@@ -658,8 +658,8 @@ public class MainForm extends javax.swing.JFrame {
         
         lblReadControlMsg.setText("");
         String deviceId = jComboBoxActiveDevices.getSelectedItem().toString().trim();
-        int payload = Integer.parseInt(txtFieldSetTelemInterval.getSelectedText().trim());
-        String methodName = txtFieldDirectMethodName.getSelectedText().trim();
+        int payload = Integer.parseInt(txtFieldSetTelemInterval.getText().trim());
+        String methodName = txtFieldDirectMethodName.getText().trim();
         
         if(!"".equals(deviceId) && payload > 0 && !"".equals(methodName)) {
             CommandControlService.controlTelemetryInterval(methodName, deviceId, payload);
