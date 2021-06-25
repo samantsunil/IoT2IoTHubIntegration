@@ -9,6 +9,7 @@ import com.microsoft.azure.sdk.iot.service.devicetwin.DeviceMethod;
 import com.microsoft.azure.sdk.iot.service.devicetwin.MethodResult;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import com.ssamant.connectioninfo.ConnectionInfo;
+import static com.ssamant.iotclouddemoapp.MainForm.lblReadControlMsg;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -47,6 +48,7 @@ public class CommandControlService {
             System.out.println("Status: " + result.getStatus());
             System.out.println("Response: " + result.getPayload());
             System.out.println("Control command successfully delivered and applied on the selected device!");
+            lblReadControlMsg.setText("control command sent to the selected device and device responded.");
         } catch (IOException | IotHubException ex) {
             System.out.println("Unable to connect to IoT Hub or calling direct method on the device. Details: " + ex.getMessage());
         }

@@ -5,14 +5,15 @@
  */
 package com.ssamant.backendservice;
 
-import com.ssamant.connectioninfo.ConnectionInfo;
-
 import com.azure.core.amqp.AmqpTransportType;
 import com.azure.core.amqp.ProxyAuthenticationType;
 import com.azure.core.amqp.ProxyOptions;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
 import com.azure.messaging.eventhubs.EventHubConsumerAsyncClient;
 import com.azure.messaging.eventhubs.models.EventPosition;
+import com.ssamant.connectioninfo.ConnectionInfo;
+
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 
