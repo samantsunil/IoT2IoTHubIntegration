@@ -185,7 +185,7 @@ public class DeviceTelemetryService {
                     MainForm.txtAreaConsoleOutput.append(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf) + " > Message: " + msgStr + "\n");
                     Object lockobj = new Object();
                     // msg.getBytes();
-                    System.out.println("Message Size: " + RamUsageEstimator.sizeOf(msg.getBytes()));
+                    System.out.println("Message size in bytes: " + RamUsageEstimator.sizeOf(msg.getBytes()));
                     // Send the message.
                     EventCallback callback = new EventCallback();
                     client.sendEventAsync(msg, callback, lockobj);
@@ -200,14 +200,6 @@ public class DeviceTelemetryService {
                 System.out.println(e.getMessage());
             }
         }
-    }
-
-    private static String createDataSize(int msgSize) {
-        StringBuilder sb = new StringBuilder(msgSize);
-        for (int i = 0; i < msgSize; i++) {
-            sb.append('a');
-        }
-        return sb.toString();
     }
 
     private static class FixedSizeMessageSender implements Runnable {
@@ -274,7 +266,7 @@ public class DeviceTelemetryService {
             //System.in.read();
             long startTime = System.currentTimeMillis();
             while (false || (System.currentTimeMillis() - startTime) < duration * 60000) {
-                //keep sending until the send duration completed ( in minutes )....
+                //keep sending operation active until the send duration completes ( in minutes )....
             }
             executor.shutdownNow();
             client.closeNow();

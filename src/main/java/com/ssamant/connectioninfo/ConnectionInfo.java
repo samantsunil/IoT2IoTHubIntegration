@@ -60,6 +60,18 @@ public class ConnectionInfo {
         return symmkeyGroup;
     }
 
+    public static String getIoTHubConnectionString() {
+        Properties prop = readPropertyFile();
+        String iothubConStr = prop.getProperty("com.ssamant.connectioninfo.iothub.service.connectionstring");
+        return iothubConStr;
+    }
+    
+    public static String getEventHubCompatibleConnectionString() {
+        Properties prop = readPropertyFile();
+        String eventHubCompConnStr = prop.getProperty("com.ssamant.connectioninfo.iothub.service.eventhubcompatible-endpoint");
+        return eventHubCompConnStr;
+    }
+
     public static Connection getDbConnection() {
         String driver = "org.postgresql.Driver";
         Properties prop = readPropertyFile();
@@ -70,14 +82,14 @@ public class ConnectionInfo {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException ex) {
-            
+
             System.out.println(ex.getMessage());
         }
         try {
             //con = DriverManager.getConnection("jdbc:mysql://136.186.108.219:3306/dpp_resources", "root", "dpp2020*");
             con = DriverManager.getConnection(postgresHost + "/" + postgresDb, username, password);
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());           
+            System.out.println(ex.getMessage());
         }
         if (con != null) {
             System.out.println("Database connection successful.");
