@@ -48,13 +48,13 @@ public class ReadDeviceToCloudMessages {
                 System.out.println("Select the right option.");
             } else {
                 switch (option) {
-                    case "all" ->
+                    case "all":
                         receiveFromAllPartitions(eventHubConsumerAsyncClient); // received data from all the partitions - default (4)
-                    case "single" ->
+                    case "single":
                         receiveFromSinglePartition(eventHubConsumerAsyncClient); // receive data from a single partition only
-                    case "batches" ->
+                    case "batches":
                         receiveFromSinglePartitionInBatches(eventHubConsumerAsyncClient, batchSize); // receives data from a single partition in the given batch size
-                    default ->
+                    default:
                         System.out.println("Select the right option.");
                 }
             }

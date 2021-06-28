@@ -3,7 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ssamant</groupId>
   <artifactId>IoTCloudDemoApp</artifactId>
-  <version>1.0-v1</version>
+  <name>IoT Cloud Integration Demo</name>
+  <version>1.0.0</version>
   <build>
     <resources>
       <resource>
@@ -21,7 +22,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.3</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -31,7 +32,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.ssamant.itoclouddemoapp.MainForm</mainClass>
+                  <mainClass>com.ssamant.iotclouddemoapp.MainForm</mainClass>
                 </transformer>
               </transformers>
             </configuration>
@@ -41,8 +42,8 @@
     </plugins>
   </build>
   <properties>
-    <maven.compiler.target>14</maven.compiler.target>
-    <maven.compiler.source>14</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
