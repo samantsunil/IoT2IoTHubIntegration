@@ -724,9 +724,10 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnReadMesssagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReadMesssagesActionPerformed
 
+        jTextAreaReadMessages.setText("");
         if (comboBoxReadPartitionSelection.getSelectedIndex() != -1) {
 
-            String readOption = comboBoxReadPartitionSelection.getSelectedItem().toString().toLowerCase();
+            String readOption = comboBoxReadPartitionSelection.getSelectedItem().toString().toLowerCase().trim();
 
             if ("all".equals(readOption)) {
                 ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, 0);
@@ -756,8 +757,7 @@ public class MainForm extends javax.swing.JFrame {
                 radioButtonBatchMode.setSelected(false);
                 txtFieldBatchReadSize.setText("100");
                 txtFieldBatchReadSize.setEnabled(false);
-            } else if("Single".equals(comboBoxReadPartitionSelection.getSelectedItem().toString().trim()))
-            {
+            } else if ("Single".equals(comboBoxReadPartitionSelection.getSelectedItem().toString().trim())) {
                 radioButtonBatchMode.setEnabled(true);
                 radioButtonBatchMode.setSelected(false);
                 txtFieldBatchReadSize.setText("100");
