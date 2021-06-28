@@ -13,6 +13,7 @@ import com.azure.messaging.eventhubs.EventHubConsumerAsyncClient;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.ssamant.connectioninfo.ConnectionInfo;
 import static com.ssamant.iotclouddemoapp.MainForm.jTextAreaReadMessages;
+import static com.ssamant.iotclouddemoapp.MainForm.stopMsgRead;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -50,13 +51,26 @@ public class ReadDeviceToCloudMessages {
                 switch (option) {
                     case "all":
                         receiveFromAllPartitions(eventHubConsumerAsyncClient); // received data from all the partitions - default (4)
+                        while (!stopMsgRead) {
+
+                        }
+                        break;
                     case "single":
                         receiveFromSinglePartition(eventHubConsumerAsyncClient); // receive data from a single partition only
+                        while (!stopMsgRead) {
+
+                        }
+                        break;
                     case "batches":
                         receiveFromSinglePartitionInBatches(eventHubConsumerAsyncClient, batchSize); // receives data from a single partition in the given batch size
+                        while (!stopMsgRead) {
+
+                        }
+                        break;
                     default:
                         System.out.println("Select the right option.");
                 }
+
             }
             //use below methods to receive from single partition or in batches from a single partition
 
@@ -79,12 +93,12 @@ public class ReadDeviceToCloudMessages {
                     System.out.println();
                     System.out.printf("%nTelemetry received from partition %s:%n%s",
                             partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getData().getBodyAsString());
-                    jTextAreaReadMessages.append("Partition: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString());
+                    jTextAreaReadMessages.append("Partition: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString() + "\n");
                     System.out.printf("%nApplication properties (set by device):%n%s", partitionEvent.getData().getProperties());
-                    jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties());
+                    jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
                     System.out.printf("%nSystem properties (set by IoT Hub):%n%s",
                             partitionEvent.getData().getSystemProperties());
-                    jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties());
+                    jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties() + "\n");
                 }, ex -> {
                     System.out.println("Error receiving events " + ex.getMessage());
                 }, () -> {
@@ -111,12 +125,12 @@ public class ReadDeviceToCloudMessages {
             System.out.println();
             System.out.printf("%nTelemetry received from partition %s:%n%s",
                     partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getData().getBodyAsString());
-            jTextAreaReadMessages.append("partition id: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString());
+            jTextAreaReadMessages.append("partition id: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString() + "\n");
             System.out.printf("%nApplication properties (set by device):%n%s", partitionEvent.getData().getProperties());
-            jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties());
+            jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
             System.out.printf("%nSystem properties (set by IoT Hub):%n%s",
                     partitionEvent.getData().getSystemProperties());
-            jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties());
+            jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties() + "\n");
         }, ex -> {
             System.out.println("Error receiving events " + ex.getMessage());
         }, () -> {
@@ -145,13 +159,13 @@ public class ReadDeviceToCloudMessages {
                         System.out.println();
                         System.out.printf("%nTelemetry received from partition %s:%n%s",
                                 partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getData().getBodyAsString());
-                        jTextAreaReadMessages.append("partition id: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString());
+                        jTextAreaReadMessages.append("partition id: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString() + "\n");
                         System.out.printf("%nApplication properties (set by device):%n%s",
                                 partitionEvent.getData().getProperties());
-                        jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties());
+                        jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
                         System.out.printf("%nSystem properties (set by IoT Hub):%n%s",
                                 partitionEvent.getData().getSystemProperties());
-                        jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties());
+                        jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties() + "\n");
                     });
                 }, ex -> {
                     System.out.println("Error receiving events " + ex.getMessage());

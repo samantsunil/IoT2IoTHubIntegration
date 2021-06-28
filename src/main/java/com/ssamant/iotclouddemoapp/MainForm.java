@@ -46,6 +46,7 @@ public class MainForm extends javax.swing.JFrame {
         populateAllDevices(); //populate existing IoT devices into combo box.
         populateTableWithdeviceIds();
     }
+    public static Boolean stopMsgRead = false;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -106,6 +107,7 @@ public class MainForm extends javax.swing.JFrame {
         radioButtonBatchMode = new javax.swing.JRadioButton();
         txtFieldBatchReadSize = new javax.swing.JTextField();
         lblReadInfoMsg = new javax.swing.JLabel();
+        btnStopReadingMessage = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("IoT Device to Cloud Telemetry Demo [Azure cloud]");
@@ -480,14 +482,27 @@ public class MainForm extends javax.swing.JFrame {
 
         lblReadInfoMsg.setText(":");
 
+        btnStopReadingMessage.setText("Stop message reading");
+        btnStopReadingMessage.setActionCommand("");
+        btnStopReadingMessage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStopReadingMessageActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblReadControlMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblReadInfoMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(jPanel3Layout.createSequentialGroup()
                             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addGroup(jPanel3Layout.createSequentialGroup()
@@ -516,14 +531,12 @@ public class MainForm extends javax.swing.JFrame {
                                 .addComponent(btnUpdateTelemInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(18, 18, 18))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(btnStopReadingMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnReadMesssages, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblReadControlMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblReadInfoMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -557,7 +570,9 @@ public class MainForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtFieldBatchReadSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnReadMesssages)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnReadMesssages)
+                    .addComponent(btnStopReadingMessage))
                 .addGap(42, 42, 42)
                 .addComponent(lblReadInfoMsg)
                 .addContainerGap(156, Short.MAX_VALUE))
@@ -723,26 +738,47 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnUpdateTelemIntervalActionPerformed
 
     private void btnReadMesssagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReadMesssagesActionPerformed
-
+        stopMsgRead = false;
         jTextAreaReadMessages.setText("");
+        ExecutorService msgReadService = Executors.newFixedThreadPool(1);
         if (comboBoxReadPartitionSelection.getSelectedIndex() != -1) {
-
+             lblReadInfoMsg.setText("Start reading messages from cloud.");
             String readOption = comboBoxReadPartitionSelection.getSelectedItem().toString().toLowerCase().trim();
 
             if ("all".equals(readOption)) {
-                ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, 0);
+                msgReadService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, 0);
+                        lblReadInfoMsg.setText("Stopped/completed reading messages from cloud.");
+                    }
+                });
+
             }
             if ("single".equals(readOption)) {
                 radioButtonBatchMode.setEnabled(true);
                 if (radioButtonBatchMode.isSelected()) {
                     txtFieldBatchReadSize.setEnabled(true);
                     if (!"".equals(txtFieldBatchReadSize.getText().trim())) {
-                        ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, Integer.parseInt(txtFieldBatchReadSize.getText().trim()));
+
+                        msgReadService.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, Integer.parseInt(txtFieldBatchReadSize.getText().trim()));
+                                lblReadInfoMsg.setText("start reading messages from cloud.");
+                            }
+                        });
                     } else {
                         lblReadInfoMsg.setText("Please select the right batch size");
                     }
                 } else {
-                    ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, 0);
+                    msgReadService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, 0);
+                            lblReadInfoMsg.setText("start reading messages from cloud.");
+                        }
+                    });
                 }
             }
 
@@ -765,6 +801,13 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_comboBoxReadPartitionSelectionActionPerformed
+
+    private void btnStopReadingMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopReadingMessageActionPerformed
+        // TODO add your handling code here:
+        if (stopMsgRead == false) {
+            stopMsgRead = true;
+        }
+    }//GEN-LAST:event_btnStopReadingMessageActionPerformed
 
     /**
      * function to populate the device info into table as well as deleting the
@@ -876,6 +919,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnReadMesssages;
     public javax.swing.JButton btnRegisterIoTDevice;
     private javax.swing.JButton btnSendTelemetry;
+    public static javax.swing.JButton btnStopReadingMessage;
     public javax.swing.JButton btnStopSending;
     private javax.swing.JButton btnUpdateTelemInterval;
     private javax.swing.JComboBox<String> comboBoxMsgProtocols;
