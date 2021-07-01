@@ -88,14 +88,15 @@ public class ReadDeviceToCloudMessages {
     private static void receiveFromAllPartitions(EventHubConsumerAsyncClient consumerClient) {
 
         jTextAreaReadMessages.setText("");
+        
         consumerClient.receive(false) //false - allows to read the newly available events instead of reading from start of the partition
                 .subscribe(partitionEvent -> {
                     System.out.println();
                     System.out.printf("%nTelemetry received from partition %s:%n%s",
                             partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getData().getBodyAsString());
-                    jTextAreaReadMessages.append("Partition: " + partitionEvent.getPartitionContext().getPartitionId() + ", message: " + partitionEvent.getData().getBodyAsString() + "\n");
+                    jTextAreaReadMessages.append(partitionEvent.getData().getBodyAsString() + "\n");
                     System.out.printf("%nApplication properties (set by device):%n%s", partitionEvent.getData().getProperties());
-                    jTextAreaReadMessages.append("app properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
+                    jTextAreaReadMessages.append("App properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
                     System.out.printf("%nSystem properties (set by IoT Hub):%n%s",
                             partitionEvent.getData().getSystemProperties());
                     jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties() + "\n");
