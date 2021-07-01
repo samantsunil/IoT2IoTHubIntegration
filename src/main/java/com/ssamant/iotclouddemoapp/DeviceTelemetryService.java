@@ -18,6 +18,7 @@ import com.ssamant.dbservice.DBOperations;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -139,29 +140,34 @@ public class DeviceTelemetryService {
                 // Initialize the simulated telemetry data.
                 double minTemperature = 20;
                 double minHumidity = 60;
-                double sensorLocLat = -37.840935f;
-                double sensorLocLong = 144.946457f;
+                //double sensorLocLat = -37.840935f;
+                //double sensorLocLong = 144.946457f;
 
                 Random rand = new Random();
+                DecimalFormat df = new DecimalFormat("##.##");
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+                double sensorLocLat = -37.840935f + rand.nextInt(100)/100.0;
+                double sensorLocLong = 144.946457f + rand.nextInt(100)/100.0;
                 while (true) {
                     // Simulate telemetry.
                     double currentTemperature = minTemperature + rand.nextDouble() * 15;
                     double currentHumidity = minHumidity + rand.nextDouble() * 20;
+                    currentTemperature = Math.round(currentTemperature*100.0)/100.0;
+                    currentHumidity = Math.round(currentHumidity*100.0)/100.0;
 
                     String infoString;
                     String levelValue;
                     if (rand.nextDouble() > 0.7) {
                         if (rand.nextDouble() > 0.5) {
                             levelValue = "critical";
-                            infoString = "Critical message delivered as alert!";
+                            infoString = "message to generate alert.";
                         } else {
                             levelValue = "storage";
-                            infoString = "Message sent to storage.";
+                            infoString = "message for storage.";
                         }
                     } else {
                         levelValue = "normal";
-                        infoString = "Normal message - delivered to real-time processing.";
+                        infoString = "message for real-time insight.";
                     }
 
                     TelemetryDataPoint telemetryDataPoint = new TelemetryDataPoint();
