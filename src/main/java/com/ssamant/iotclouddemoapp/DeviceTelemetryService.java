@@ -43,6 +43,7 @@ public class DeviceTelemetryService {
     private static int duration = 0;
     private static int interval = 0;
     private static DeviceClient client;
+    private static int messageSize = 0;
 
     private static String devID = "";
 
@@ -96,6 +97,10 @@ public class DeviceTelemetryService {
             interval = interval * val;
         }
 
+        private void turnOffTelemetrySending(Boolean turnOff) {
+            System.out.println("Direct method # send command to turn Off the telemetry sending");
+        }
+
         @Override
         public DeviceMethodData call(String methodName, Object methodData, Object context) {
             DeviceMethodData deviceMethodData;
@@ -108,6 +113,21 @@ public class DeviceTelemetryService {
                         interval = Integer.parseInt(payload);
                         System.out.println(payload);
                         setTelemetryInterval(interval);
+                        deviceMethodData = new DeviceMethodData(status, "Executed direct method " + methodName);
+                    } catch (NumberFormatException e) {
+                        int status = INVALID_PARAMETER;
+                        deviceMethodData = new DeviceMethodData(status, "Invalid parameter " + payload);
+                    }
+                    break;
+                }
+
+                case "TurnOffTelemetrySending": {
+                    Boolean val;
+                    try {
+                        int status = METHOD_SUCCESS;
+                        val = Boolean.parseBoolean(payload);
+                        System.out.println(payload);
+                        turnOffTelemetrySending(val);
                         deviceMethodData = new DeviceMethodData(status, "Executed direct method " + methodName);
                     } catch (NumberFormatException e) {
                         int status = INVALID_PARAMETER;
@@ -146,14 +166,14 @@ public class DeviceTelemetryService {
                 Random rand = new Random();
                 DecimalFormat df = new DecimalFormat("##.##");
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
-                double sensorLocLat = -37.840935f + rand.nextInt(100)/100.0;
-                double sensorLocLong = 144.946457f + rand.nextInt(100)/100.0;
+                double sensorLocLat = -37.840935f + rand.nextInt(100) / 100.0;
+                double sensorLocLong = 144.946457f + rand.nextInt(100) / 100.0;
                 while (true) {
                     // Simulate telemetry.
                     double currentTemperature = minTemperature + rand.nextDouble() * 15;
                     double currentHumidity = minHumidity + rand.nextDouble() * 20;
-                    currentTemperature = Math.round(currentTemperature*100.0)/100.0;
-                    currentHumidity = Math.round(currentHumidity*100.0)/100.0;
+                    currentTemperature = Math.round(currentTemperature * 100.0) / 100.0;
+                    currentHumidity = Math.round(currentHumidity * 100.0) / 100.0;
 
                     String infoString;
                     String levelValue;
@@ -215,7 +235,7 @@ public class DeviceTelemetryService {
             try {
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
                 while (true) {
-                    byte[] msgSize = new byte[200];
+                    byte[] msgSize = new byte[messageSize];
                     String msgStr = Arrays.toString(msgSize);
                     Message msg = new Message(msgStr);
                     msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
@@ -277,6 +297,7 @@ public class DeviceTelemetryService {
             executor.shutdownNow();
             client.closeNow();
             stopSendindTelemetry(device.getDeviceId());
+
             MainForm.txtAreaConsoleOutput.append("Finished sending telemetry.");
         } catch (URISyntaxException | IllegalArgumentException ex) {
             System.out.println("Error occured while conneting to IoT Hub: " + ex.getMessage());
@@ -291,13 +312,15 @@ public class DeviceTelemetryService {
             duration = sendDuration;
             devID = device.getDeviceId();
             interval = Integer.parseInt(device.getTelemInterval());
+            messageSize = Integer.parseInt(device.getMessageSize().trim());
             IotHubClientProtocol msgProtocol = null;
+
             if ("AMQP".equals(device.getProtocol())) {
                 msgProtocol = IotHubClientProtocol.AMQPS;
             } else if ("MQTT".equals(device.getProtocol())) {
                 msgProtocol = IotHubClientProtocol.MQTT;
             } else {
-                System.out.println("Invalid transport protocol!");
+                System.out.println("Invalid transport protocol selection!");
                 return 0;
             }
             SendTelemetry(device, msgProtocol);
