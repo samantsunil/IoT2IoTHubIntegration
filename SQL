@@ -1,0 +1,21 @@
+-- Table: public.deviceinfo
+
+-- DROP TABLE public.deviceinfo;
+
+CREATE TABLE public.deviceinfo
+(
+    deviceid character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    msgsize character varying(32) COLLATE pg_catalog."default",
+    teleminterval character varying(32) COLLATE pg_catalog."default",
+    protocol character varying(64) COLLATE pg_catalog."default",
+    connectionstring character varying(255) COLLATE pg_catalog."default",
+    iothuburi character varying(255) COLLATE pg_catalog."default",
+    deviceowner character varying(128) COLLATE pg_catalog."default",
+    active boolean,
+    CONSTRAINT deviceinfo_pkey PRIMARY KEY (deviceid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.deviceinfo
+    OWNER to <db-user>;
