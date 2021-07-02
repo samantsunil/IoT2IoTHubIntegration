@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
@@ -43,6 +45,9 @@ public class MainForm extends javax.swing.JFrame {
         ((JLabel) comboBoxMsgProtocols.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         ((JLabel) comboBoxRegDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         ((JLabel) jComboBoxActiveDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+        URL url = getClass().getResource("/appIcon.png");
+        ImageIcon imgicon = new ImageIcon(url);
+        this.setIconImage(imgicon.getImage());
         populateAllDevices(); //populate existing IoT devices into combo box.
         populateTableWithdeviceIds();
     }
@@ -536,7 +541,7 @@ public class MainForm extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnReadMesssages, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
