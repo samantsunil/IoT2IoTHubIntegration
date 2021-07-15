@@ -43,7 +43,7 @@ public class ReadDeviceToCloudMessages {
         //setupProxy(consumerClientBuilder);
         //If WebSockets need to use - use below method (AMQP over Web Sockets)
         //consumerClientBuilder.transportType(AmqpTransportType.AMQP_WEB_SOCKETS);
-        try ( EventHubConsumerAsyncClient eventHubConsumerAsyncClient = consumerClientBuilder.buildAsyncConsumerClient()) {
+        try (EventHubConsumerAsyncClient eventHubConsumerAsyncClient = consumerClientBuilder.buildAsyncConsumerClient()) {
 
             if (null == option) {
                 System.out.println("Select the right option.");
@@ -52,7 +52,7 @@ public class ReadDeviceToCloudMessages {
                     case "all":
                         receiveFromAllPartitions(eventHubConsumerAsyncClient); // received data from all the partitions - default (4)
                         while (!stopMsgRead) {
-
+                          
                         }
                         break;
                     case "single":
@@ -88,7 +88,7 @@ public class ReadDeviceToCloudMessages {
     private static void receiveFromAllPartitions(EventHubConsumerAsyncClient consumerClient) {
 
         jTextAreaReadMessages.setText("");
-        
+
         consumerClient.receive(false) //false - allows to read the newly available events instead of reading from start of the partition
                 .subscribe(partitionEvent -> {
                     System.out.println();

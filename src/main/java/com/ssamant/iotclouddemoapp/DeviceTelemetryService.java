@@ -15,7 +15,6 @@ import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.Message;
 import com.ssamant.dbservice.DBOperations;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
@@ -26,9 +25,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -42,6 +38,7 @@ public class DeviceTelemetryService {
     private static final int D2C_MESSAGE_TIMEOUT = 2000;
     private static int duration = 0;
     private static int interval = 0;
+    private static Boolean turnOn = false;
     private static DeviceClient client;
     private static int messageSize = 0;
 
@@ -97,8 +94,9 @@ public class DeviceTelemetryService {
             interval = interval * val;
         }
 
-        private void turnOffTelemetrySending(Boolean turnOff) {
-            System.out.println("Direct method # send command to turn Off the telemetry sending");
+        private void turnOffTelemetrySending(Boolean val) {
+            System.out.println("Direct method # send command to turn Off the telemetry sending.");
+            turnOn = val;
         }
 
         @Override
@@ -160,9 +158,7 @@ public class DeviceTelemetryService {
                 // Initialize the simulated telemetry data.
                 double minTemperature = 20;
                 double minHumidity = 60;
-                //double sensorLocLat = -37.840935f;
-                //double sensorLocLong = 144.946457f;
-
+                
                 Random rand = new Random();
                 DecimalFormat df = new DecimalFormat("##.##");
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
@@ -206,6 +202,13 @@ public class DeviceTelemetryService {
                     //msg.setProperty("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
                     msg.setProperty("level", levelValue);
                     msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
+                    if(turnOn) {
+                        msg.setInputName("messages from channel A (turn ON mode).");
+                    }
+                    else {
+                        msg.setInputName("messages from channel B (turn OFF Mode.");
+                    }
+                    
                     //System.out.println("Sending message: " + msgStr);
                     System.out.println(String.format("%s > Message: %s", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf), msgStr));
                     MainForm.txtAreaConsoleOutput.append(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf) + " > Message: " + msgStr + "\n");

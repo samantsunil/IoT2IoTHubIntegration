@@ -33,7 +33,7 @@ public class DBOperations {
                 ConnectionInfo.con = getDbConnection();
             }
             String Updatequery = "UPDATE deviceinfo SET msgsize = ?, teleminterval = ?, protocol = ?, active = ? WHERE deviceid = ?";
-            try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
+            try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
                 pstmt.setString(1, device.getMessageSize());
                 pstmt.setString(2, device.getTelemInterval());
                 pstmt.setString(3, device.getProtocol());
@@ -60,7 +60,7 @@ public class DBOperations {
         if (ConnectionInfo.con == null) {
             ConnectionInfo.con = getDbConnection();
         }
-        try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(insertSQL)) {
+        try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(insertSQL)) {
 
             pstmt.setString(1, device.getDeviceId());
             pstmt.setString(2, device.getConnectionString());
@@ -88,7 +88,7 @@ public class DBOperations {
                 ConnectionInfo.con = getDbConnection();
             }
             String Updatequery = "UPDATE deviceinfo SET active = ? WHERE deviceid = ?";
-            try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
+            try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
                 pstmt.setBoolean(1, status);
                 pstmt.setString(2, deviceId);
 
@@ -129,6 +129,30 @@ public class DBOperations {
         return deviceList;
     }
 
+    public static ArrayList getAllDirectMethods() {
+        if (ConnectionInfo.con == null) {
+            ConnectionInfo.con = getDbConnection();
+        }
+        ArrayList<String> methods = new ArrayList<>();
+
+        String qry = "SELECT DISTINCT methodname FROM devicecallbackmethod";
+        try {
+            Statement stm;
+            stm = ConnectionInfo.con.createStatement();
+
+            try (ResultSet rs = stm.executeQuery(qry)) {
+                while (rs.next()) {
+                    String methodName = rs.getString("methodname");
+                    methods.add(methodName);
+                }
+            }
+
+        } catch (SQLException ex) {
+
+        }
+        return methods;
+    }
+
     /**
      * method to obtain device info, such as device id, deviceowner and active
      * status.
@@ -159,10 +183,10 @@ public class DBOperations {
             ConnectionInfo.con = getDbConnection();
         }
 
-        String[] devConnInfo = new String[2];       
+        String[] devConnInfo = new String[2];
         ResultSet rs = null;
         String qry = "SELECT connectionstring, iothuburi FROM deviceinfo WHERE deviceId = ? AND active = ?";
-        try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(qry)) {
+        try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(qry)) {
             pstmt.setString(1, deviceId);
             pstmt.setBoolean(2, false);
 
@@ -180,24 +204,25 @@ public class DBOperations {
         }
         return devConnInfo;
     }
-    
+
     public static Boolean isDeviceActive(String deviceId) {
         if (ConnectionInfo.con == null) {
             ConnectionInfo.con = getDbConnection();
         }
-        Boolean isActive = false;             
+        Boolean isActive = false;
         ResultSet rs = null;
         String qry = "SELECT active FROM deviceinfo WHERE deviceId = ?";
-        try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(qry)) {
-            pstmt.setString(1, deviceId);           
+        try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(qry)) {
+            pstmt.setString(1, deviceId);
 
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                isActive = rs.getBoolean("active");            }
+                isActive = rs.getBoolean("active");
+            }
             rs.close();
 
         } catch (SQLException ex) {
-         System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage());
         }
         return isActive;
     }
@@ -209,7 +234,7 @@ public class DBOperations {
                 ConnectionInfo.con = getDbConnection();
             }
             String Updatequery = "DELETE FROM deviceinfo WHERE deviceid = ?";
-            try ( PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
+            try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
                 pstmt.setString(1, deviceId);
 
                 pstmt.executeUpdate();

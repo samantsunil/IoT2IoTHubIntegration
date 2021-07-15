@@ -30,7 +30,7 @@ public class CommandControlService {
     private static final Long RESPONSE_TIMEOUT = TimeUnit.SECONDS.toSeconds(30);
     private static final Long CONNECT_TIMEOUT = TimeUnit.SECONDS.toSeconds(5);
 
-    public static void controlTelemetryInterval(String methodName, String deviceId, int payload) {
+    public static void controlTelemetryInterval(String methodName, String deviceId, Object payload) {
 
         try {
             System.out.println("Calling direct method...");
@@ -39,7 +39,7 @@ public class CommandControlService {
             // Call the direct method.
             //https://<iothuburi>/twins/<device_id>/methods?api-version=2018-06-30  - REST API url
             MethodResult result = directMethodInstance.invoke(deviceId, methodName, RESPONSE_TIMEOUT, CONNECT_TIMEOUT, payload);
-
+            
             if (result == null) {
                 throw new IOException("Direct method invoke returns null");
             }

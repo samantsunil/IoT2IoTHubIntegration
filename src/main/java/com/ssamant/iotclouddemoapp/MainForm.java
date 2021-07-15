@@ -45,11 +45,13 @@ public class MainForm extends javax.swing.JFrame {
         ((JLabel) comboBoxMsgProtocols.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         ((JLabel) comboBoxRegDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         ((JLabel) jComboBoxActiveDevices.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+        ((JLabel) comboBoxDirectMethods.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         URL url = getClass().getResource("/appIcon.png");
         ImageIcon imgicon = new ImageIcon(url);
         this.setIconImage(imgicon.getImage());
         populateAllDevices(); //populate existing IoT devices into combo box.
         populateTableWithdeviceIds();
+        populateDirectMethods();
     }
     public static Boolean stopMsgRead = false;
 
@@ -106,13 +108,13 @@ public class MainForm extends javax.swing.JFrame {
         jTextAreaReadMessages = new javax.swing.JTextArea();
         lblReadControlMsg = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        txtFieldDirectMethodName = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         comboBoxReadPartitionSelection = new javax.swing.JComboBox<>();
         radioButtonBatchMode = new javax.swing.JRadioButton();
         txtFieldBatchReadSize = new javax.swing.JTextField();
         lblReadInfoMsg = new javax.swing.JLabel();
         btnStopReadingMessage = new javax.swing.JButton();
+        comboBoxDirectMethods = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("IoT Device to Cloud Telemetry Demo [Azure cloud]");
@@ -439,7 +441,7 @@ public class MainForm extends javax.swing.JFrame {
 
         jComboBoxActiveDevices.setAutoscrolls(true);
 
-        jLabel9.setText("Telemetry Interval (secs):");
+        jLabel9.setText("Payload:");
 
         txtFieldSetTelemInterval.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
@@ -465,8 +467,6 @@ public class MainForm extends javax.swing.JFrame {
         lblReadControlMsg.setAutoscrolls(true);
 
         jLabel10.setText("Method name:");
-
-        txtFieldDirectMethodName.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         jLabel11.setText("Select partitions for read:");
 
@@ -514,17 +514,14 @@ public class MainForm extends javax.swing.JFrame {
                                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(333, 333, 333))
                                 .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(54, 54, 54))
-                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                            .addComponent(jLabel9)
-                                            .addGap(17, 17, 17)))
+                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
+                                        .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGap(54, 54, 54)
                                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addComponent(txtFieldSetTelemInterval)
-                                        .addComponent(txtFieldDirectMethodName)
-                                        .addComponent(jComboBoxActiveDevices, 0, 315, Short.MAX_VALUE)))
+                                        .addComponent(jComboBoxActiveDevices, 0, 315, Short.MAX_VALUE)
+                                        .addComponent(comboBoxDirectMethods, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addGroup(jPanel3Layout.createSequentialGroup()
                                     .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(50, 50, 50)
@@ -541,7 +538,7 @@ public class MainForm extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnReadMesssages, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -556,8 +553,8 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(jComboBoxActiveDevices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtFieldDirectMethodName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10))
+                    .addComponent(jLabel10)
+                    .addComponent(comboBoxDirectMethods, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtFieldSetTelemInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -580,7 +577,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btnStopReadingMessage))
                 .addGap(42, 42, 42)
                 .addComponent(lblReadInfoMsg)
-                .addContainerGap(156, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
 
         tabbedPaneMain.addTab("Read Device to Cloud Messages & Control Device", jPanel3);
@@ -733,11 +730,12 @@ public class MainForm extends javax.swing.JFrame {
     private void btnUpdateTelemIntervalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateTelemIntervalActionPerformed
 
         lblReadControlMsg.setText("");
+        Object payload = txtFieldSetTelemInterval.getText().trim();
         String deviceId = jComboBoxActiveDevices.getSelectedItem().toString().trim();
-        int payload = Integer.parseInt(txtFieldSetTelemInterval.getText().trim());
-        String methodName = txtFieldDirectMethodName.getText().trim();
+        //int payload = Integer.parseInt(txtFieldSetTelemInterval.getText().trim());
+        String methodName = comboBoxDirectMethods.getSelectedItem().toString().trim();
 
-        if (!"".equals(deviceId) && payload > 0 && !"".equals(methodName)) {
+        if (!"".equals(deviceId) && !"".equals(String.valueOf(payload)) && !"".equals(methodName)) {
             CommandControlService.controlTelemetryInterval(methodName, deviceId, payload);
         }
     }//GEN-LAST:event_btnUpdateTelemIntervalActionPerformed
@@ -747,7 +745,7 @@ public class MainForm extends javax.swing.JFrame {
         jTextAreaReadMessages.setText("");
         ExecutorService msgReadService = Executors.newFixedThreadPool(1);
         if (comboBoxReadPartitionSelection.getSelectedIndex() != -1) {
-             lblReadInfoMsg.setText("Start reading messages from cloud.");
+            lblReadInfoMsg.setText("Start reading messages from cloud.");
             String readOption = comboBoxReadPartitionSelection.getSelectedItem().toString().toLowerCase().trim();
 
             if ("all".equals(readOption)) {
@@ -927,6 +925,7 @@ public class MainForm extends javax.swing.JFrame {
     public static javax.swing.JButton btnStopReadingMessage;
     public javax.swing.JButton btnStopSending;
     private javax.swing.JButton btnUpdateTelemInterval;
+    private javax.swing.JComboBox<String> comboBoxDirectMethods;
     private javax.swing.JComboBox<String> comboBoxMsgProtocols;
     private javax.swing.JComboBox<String> comboBoxReadPartitionSelection;
     private javax.swing.JComboBox<String> comboBoxRegDevices;
@@ -965,11 +964,19 @@ public class MainForm extends javax.swing.JFrame {
     public static javax.swing.JTextArea txtAreaConsoleOutput;
     private javax.swing.JTextField txtFieldBatchReadSize;
     private javax.swing.JTextField txtFieldDeviceOwner;
-    private javax.swing.JTextField txtFieldDirectMethodName;
     private javax.swing.JTextField txtFieldDuration;
     private javax.swing.JTextField txtFieldMsgSize;
     private javax.swing.JTextField txtFieldNumDevices;
     private javax.swing.JTextField txtFieldSetTelemInterval;
     private javax.swing.JTextField txtFieldTelemFrequency;
     // End of variables declaration//GEN-END:variables
+
+    private void populateDirectMethods() {
+
+        ArrayList<String> methods = DBOperations.getAllDirectMethods();
+        methods.forEach(method -> {
+            comboBoxDirectMethods.addItem(method);
+
+        });
+    }
 }
