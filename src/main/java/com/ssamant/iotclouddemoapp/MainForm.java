@@ -743,7 +743,7 @@ public class MainForm extends javax.swing.JFrame {
     private void btnReadMesssagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReadMesssagesActionPerformed
         stopMsgRead = false;
         jTextAreaReadMessages.setText("");
-        ExecutorService msgReadService = Executors.newFixedThreadPool(1);
+        ExecutorService msgReadService = Executors.newFixedThreadPool(2);
         if (comboBoxReadPartitionSelection.getSelectedIndex() != -1) {
             lblReadInfoMsg.setText("Start reading messages from cloud.");
             String readOption = comboBoxReadPartitionSelection.getSelectedItem().toString().toLowerCase().trim();
@@ -753,7 +753,15 @@ public class MainForm extends javax.swing.JFrame {
                     @Override
                     public void run() {
                         ReadDeviceToCloudMessages.readDeviceMessagesIngestedToIoTHub(readOption, 0);
-                        lblReadInfoMsg.setText("Stopped/completed reading messages from cloud.");
+                        lblReadInfoMsg.setText("start reading messages from cloud.");
+                        btnStopReadingMessage.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                //eventHubConsumerAsyncClient.close();
+                                msgReadService.shutdownNow();
+                                System.out.println("message read operation stopped.");
+                            }
+                        });
                     }
                 });
 

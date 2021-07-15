@@ -12,11 +12,16 @@ import com.azure.messaging.eventhubs.EventHubClientBuilder;
 import com.azure.messaging.eventhubs.EventHubConsumerAsyncClient;
 import com.azure.messaging.eventhubs.models.EventPosition;
 import com.ssamant.connectioninfo.ConnectionInfo;
+import static com.ssamant.iotclouddemoapp.MainForm.btnStopReadingMessage;
 import static com.ssamant.iotclouddemoapp.MainForm.jTextAreaReadMessages;
 import static com.ssamant.iotclouddemoapp.MainForm.stopMsgRead;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -51,21 +56,29 @@ public class ReadDeviceToCloudMessages {
                 switch (option) {
                     case "all":
                         receiveFromAllPartitions(eventHubConsumerAsyncClient); // received data from all the partitions - default (4)
-                        while (!stopMsgRead) {
-                          
-                        }
+                        
+//                        btnStopReadingMessage.addActionListener(new ActionListener() {
+//                            @Override
+//                            public void actionPerformed(ActionEvent e) {
+//                                //eventHubConsumerAsyncClient.close();
+//                                System.out.println("message read operation stopped.");
+//                            }
+//                        });
+
                         break;
                     case "single":
                         receiveFromSinglePartition(eventHubConsumerAsyncClient); // receive data from a single partition only
                         while (!stopMsgRead) {
 
                         }
+                        eventHubConsumerAsyncClient.close();
                         break;
                     case "batches":
                         receiveFromSinglePartitionInBatches(eventHubConsumerAsyncClient, batchSize); // receives data from a single partition in the given batch size
                         while (!stopMsgRead) {
 
                         }
+                        eventHubConsumerAsyncClient.close();
                         break;
                     default:
                         System.out.println("Select the right option.");
@@ -105,6 +118,8 @@ public class ReadDeviceToCloudMessages {
                 }, () -> {
                     System.out.println("Completed receiving events");
                 });
+        
+
     }
 
     /**

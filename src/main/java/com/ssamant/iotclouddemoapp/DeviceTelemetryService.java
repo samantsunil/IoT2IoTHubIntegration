@@ -52,6 +52,7 @@ public class DeviceTelemetryService {
         public double lat;
         public double longi;
         public String pointInfo;
+        public Boolean onOff;
 
         // Serialize object to JSON format.
         public String serialize() {
@@ -193,6 +194,7 @@ public class DeviceTelemetryService {
                     telemetryDataPoint.longi = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
                     telemetryDataPoint.pointInfo = infoString;
+                    telemetryDataPoint.onOff = turnOn;
                     // Add the telemetry to the message body as JSON.
                     String msgStr = telemetryDataPoint.serialize();
                     Message msg = new Message(msgStr);
@@ -202,13 +204,7 @@ public class DeviceTelemetryService {
                     //msg.setProperty("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
                     msg.setProperty("level", levelValue);
                     msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
-                    if(turnOn) {
-                        msg.setInputName("messages from channel A (turn ON mode).");
-                    }
-                    else {
-                        msg.setInputName("messages from channel B (turn OFF Mode.");
-                    }
-                    
+                                        
                     //System.out.println("Sending message: " + msgStr);
                     System.out.println(String.format("%s > Message: %s", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf), msgStr));
                     MainForm.txtAreaConsoleOutput.append(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf) + " > Message: " + msgStr + "\n");
