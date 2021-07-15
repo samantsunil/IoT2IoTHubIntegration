@@ -91,7 +91,7 @@ public class DeviceTelemetryService {
     protected static class DirectMethodCallback implements DeviceMethodCallback {
 
         private void setTelemetryInterval(int val) {
-            System.out.println("Direct method # Setting telemetry interval (seconds): " + val);
+            System.out.println("Direct method # Setting telemetry interval (seconds): " + val * interval);
             interval = interval * val;
         }
 
