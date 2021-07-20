@@ -20,8 +20,6 @@ import java.awt.event.ActionListener;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -103,10 +101,10 @@ public class ReadDeviceToCloudMessages {
                             partitionEvent.getPartitionContext().getPartitionId(), partitionEvent.getData().getBodyAsString());
                     jTextAreaReadMessages.append(partitionEvent.getData().getBodyAsString() + "\n");
                     System.out.printf("%nApplication properties (set by device):%n%s", partitionEvent.getData().getProperties());
-                    jTextAreaReadMessages.append("App properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
+                    //jTextAreaReadMessages.append("App properties (set by device): " + partitionEvent.getData().getProperties() + "\n");
                     System.out.printf("%nSystem properties (set by IoT Hub):%n%s",
                             partitionEvent.getData().getSystemProperties());
-                    jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties() + "\n");
+                    //jTextAreaReadMessages.append("system properties (set by IoT Hub): " + partitionEvent.getData().getSystemProperties() + "\n");
                 }, ex -> {
                     System.out.println("Error receiving events " + ex.getMessage());
                 }, () -> {
