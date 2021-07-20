@@ -115,6 +115,7 @@ public class MainForm extends javax.swing.JFrame {
         lblReadInfoMsg = new javax.swing.JLabel();
         btnStopReadingMessage = new javax.swing.JButton();
         comboBoxDirectMethods = new javax.swing.JComboBox<>();
+        btnClearTextArea = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("IoT Device to Cloud Telemetry Demo [Azure cloud]");
@@ -495,18 +496,19 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        btnClearTextArea.setText("Clear Messages");
+        btnClearTextArea.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearTextAreaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblReadControlMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblReadInfoMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(jPanel3Layout.createSequentialGroup()
                             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -537,7 +539,18 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(btnStopReadingMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnReadMesssages, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblReadControlMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblReadInfoMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(142, 142, 142)
+                                .addComponent(btnClearTextArea, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -577,7 +590,9 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btnStopReadingMessage))
                 .addGap(42, 42, 42)
                 .addComponent(lblReadInfoMsg)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addGap(54, 54, 54)
+                .addComponent(btnClearTextArea)
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         tabbedPaneMain.addTab("Read Device to Cloud Messages & Control Device", jPanel3);
@@ -820,6 +835,11 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnStopReadingMessageActionPerformed
 
+    private void btnClearTextAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearTextAreaActionPerformed
+        // TODO add your handling code here:
+        jTextAreaReadMessages.setText("");
+    }//GEN-LAST:event_btnClearTextAreaActionPerformed
+
     /**
      * function to populate the device info into table as well as deleting the
      * selected devices from the table.
@@ -926,6 +946,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClearTextArea;
     private javax.swing.JButton btnDeviceDeregister;
     private javax.swing.JButton btnReadMesssages;
     public javax.swing.JButton btnRegisterIoTDevice;
