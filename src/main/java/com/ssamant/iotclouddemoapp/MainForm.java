@@ -119,6 +119,11 @@ public class MainForm extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("IoT Device to Cloud Telemetry Demo [Azure cloud]");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         tabbedPaneMain.setAutoscrolls(true);
         tabbedPaneMain.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -222,7 +227,7 @@ public class MainForm extends javax.swing.JFrame {
 
         jLabel2.setText("Messaging Protocol:");
 
-        comboBoxMsgProtocols.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "MQTT", "AMQP", " " }));
+        comboBoxMsgProtocols.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "MQTT", "AMQP", "HTTPS", " " }));
 
         jLabel3.setText("Telemetry Send Interval:");
 
@@ -705,8 +710,7 @@ public class MainForm extends javax.swing.JFrame {
         teleService.submit(new Runnable() {
             @Override
             public void run() {
-                DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);
-                lblSendStopMsg.setText("Finished telemetry sending operation for the defined duration.");
+                DeviceTelemetryService.sendDeviceTelemetryToCloud(device, duration);                
                 model.setRowCount(0);
                 populateTableWithdeviceIds();
             }
@@ -839,6 +843,10 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         jTextAreaReadMessages.setText("");
     }//GEN-LAST:event_btnClearTextAreaActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        DeviceTelemetryService.onMainWindowsClosing();
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * function to populate the device info into table as well as deleting the
@@ -986,7 +994,7 @@ public class MainForm extends javax.swing.JFrame {
     public javax.swing.JLabel labelDeviceRegSuccess;
     public static javax.swing.JLabel lblReadControlMsg;
     private javax.swing.JLabel lblReadInfoMsg;
-    private javax.swing.JLabel lblSendStopMsg;
+    public static javax.swing.JLabel lblSendStopMsg;
     private javax.swing.JRadioButton radioButtonBatchMode;
     private javax.swing.JTabbedPane tabbedPaneMain;
     private javax.swing.JTable tableDeviceInfo;
