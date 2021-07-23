@@ -16,6 +16,7 @@ import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.Message;
 import com.ssamant.dbservice.DBOperations;
 import static com.ssamant.iotclouddemoapp.MainForm.lblSendStopMsg;
+import java.awt.Point;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
@@ -39,11 +40,11 @@ public class DeviceTelemetryService {
     private static final int METHOD_NOT_DEFINED = 404;
     private static final int INVALID_PARAMETER = 400;
     private static final int D2C_MESSAGE_TIMEOUT = 2000;
-    
+
     private static int duration = 0;
-    private static int interval = 0;    
+    private static int interval = 0;
     private static Boolean turnOn = false;
-    
+
     private static DeviceClient client;
     private static ExecutorService executor;
     private static int messageSize = 0;
@@ -56,11 +57,37 @@ public class DeviceTelemetryService {
         public double temperature;
         public double humidity;
         public double lat;
-        public double longi;
-        public String devInfo;
-        public Boolean onOff;
+        public double lon;
+        public String weatherInfo;
+        public Boolean isMoving;
 
         // Serialize object to JSON format.
+        public String serialize() {
+            Gson gson = new Gson();
+            return gson.toJson(this);
+        }
+    }
+
+    private static class GeoLocAwareTelemetryDataPoint {
+
+        public String deviceId;
+        public double temp;
+        public double humidity;
+        public String weatherInfo;
+        public Boolean isMoving;
+        public GeoLocation point;
+
+        public String serialize() {
+            Gson gson = new Gson();
+            return gson.toJson(this);
+        }
+    }
+
+    private static class GeoLocation {
+
+        public double lat;
+        public double lon;
+
         public String serialize() {
             Gson gson = new Gson();
             return gson.toJson(this);
@@ -158,7 +185,9 @@ public class DeviceTelemetryService {
      * update the telemetry interval value.
      */
     private static class MessageSender implements Runnable {
+
         public String deviceId;
+
         @Override
         public void run() {
             try {
@@ -210,10 +239,10 @@ public class DeviceTelemetryService {
                     telemetryDataPoint.temperature = currentTemperature;
                     telemetryDataPoint.humidity = currentHumidity;
                     telemetryDataPoint.lat = sensorLocLat;
-                    telemetryDataPoint.longi = sensorLocLong;
+                    telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
-                    telemetryDataPoint.devInfo = infoString;
-                    telemetryDataPoint.onOff = turnOn;
+                    telemetryDataPoint.weatherInfo = infoString;
+                    telemetryDataPoint.isMoving = turnOn;
                     // Add the telemetry to the message body as JSON.
                     String msgStr = telemetryDataPoint.serialize();
                     Message msg = new Message(msgStr);
@@ -221,6 +250,8 @@ public class DeviceTelemetryService {
                     // Add a custom application property to the message.
                     // An IoT hub can filter on these properties without access to the message body.
                     //msg.setProperty("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
+                    msg.setContentEncoding("utf-8");
+                    msg.setContentTypeFinal("application/json");
                     msg.setProperty("level", levelValue);
                     msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
 
@@ -287,6 +318,122 @@ public class DeviceTelemetryService {
         }
     }
 
+    private static class GeoLocationMessgeSender implements Runnable {
+
+        public String deviceId;
+       int i = 0;
+        @Override
+        public void run() {
+            try {
+                // Initialize the simulated telemetry data.
+                double minTemperature = 0;
+                double minHumidity = 10;
+
+                Random rand = new Random();
+                DecimalFormat df = new DecimalFormat("##.##");
+                DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+                double sensorLocLat = -37.840935f + rand.nextInt(4) / 1.0;
+                double sensorLocLong = 144.946457f + rand.nextInt(5) / 1.0;
+                long startTime = System.currentTimeMillis();
+
+                while ((System.currentTimeMillis() - startTime) < duration * 60000) {
+                    // Simulate telemetry.
+                    double currentTemperature = minTemperature + rand.nextDouble() * 50;
+                    double currentHumidity = minHumidity + rand.nextDouble() * 90;
+                    currentTemperature = Math.round(currentTemperature * 100.0) / 100.0;
+                    currentHumidity = Math.round(currentHumidity * 100.0) / 100.0;
+                    
+                    if (turnOn) {
+                        if (i % 2 == 0) {
+                            sensorLocLat = sensorLocLat + rand.nextDouble();
+                            sensorLocLong = sensorLocLong + rand.nextDouble();
+                        } else {
+                            sensorLocLat = sensorLocLat - rand.nextDouble();
+                            sensorLocLong = sensorLocLong - rand.nextDouble();
+                        }
+                    }
+                    i++;
+                    String infoString;
+                    String levelValue;
+                    if (currentTemperature > 35.00f) {
+                        if (currentHumidity > 95.00f) {
+                            levelValue = "hothumid";
+                            infoString = "Hot and humid weather";
+                        } else if (currentHumidity < 20.00f) {
+                            levelValue = "hotdry";
+                            infoString = "Hot and dry weather";
+                        } else {
+                            levelValue = "Hot";
+                            infoString = "Hot weather";
+                        }
+                    } else if (currentTemperature < 10.00f) {
+                        if (currentHumidity < 20.00f) {
+                            levelValue = "colddry";
+                            infoString = "Cold and dry weather";
+                        } else {
+                            levelValue = "cold";
+                            infoString = "Cold weather";
+                        }
+                    } else {
+                        levelValue = "normal";
+                        infoString = "Normal weather";
+                    }
+
+                    GeoLocAwareTelemetryDataPoint telemetryDataPoint = new GeoLocAwareTelemetryDataPoint();
+                    telemetryDataPoint.temp = currentTemperature;
+                    telemetryDataPoint.humidity = currentHumidity;
+
+                    telemetryDataPoint.deviceId = devID;
+                    telemetryDataPoint.weatherInfo = infoString;
+                    telemetryDataPoint.isMoving = turnOn;
+
+                    GeoLocation point = new GeoLocation();
+                    point.lat = sensorLocLat;
+                    point.lon = sensorLocLong;
+                    telemetryDataPoint.point = point;
+
+                    // Add the telemetry to the message body as JSON.
+                    String msgStr = telemetryDataPoint.serialize();
+                    Message msg = new Message(msgStr);
+
+                    // Add a custom application property to the message.
+                    // An IoT hub can filter on these properties without access to the message body.
+                    //msg.setProperty("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
+                    msg.setContentEncoding("utf-8");
+                    msg.setContentTypeFinal("application/json");
+                    msg.setProperty("level", levelValue);
+                    msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
+
+                    //System.out.println("Sending message: " + msgStr);
+                    System.out.println(String.format("%s > Message: %s", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf), msgStr));
+                    MainForm.txtAreaConsoleOutput.append(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf) + " > Message: " + msgStr + "\n");
+                    Object lockobj = new Object();
+                    // msg.getBytes();
+                    System.out.println("Message size in bytes: " + RamUsageEstimator.sizeOf(msg.getBytes()));
+                    // Send the message.
+                    EventCallback callback = new EventCallback();
+                    client.sendEventAsync(msg, callback, lockobj);
+
+                    synchronized (lockobj) {
+                        lockobj.wait();
+                    }
+                    Thread.sleep(interval);
+                }
+                System.out.println("Finished sending telemetry to cloud...");
+                MainForm.txtAreaConsoleOutput.append("Finished sending telemetry.");
+                lblSendStopMsg.setText("Finished telemetry sending operation for the defined duration.");
+                DBOperations.updateDeviceStatus(deviceId, false);
+                client.closeNow();
+                executor.shutdownNow();
+            } catch (InterruptedException e) {
+                //System.out.println("Finished.");
+                System.out.println(e.getMessage());
+            } catch (IOException ex) {
+                System.out.println("Error in disconnecting client - " + ex.getMessage());
+            }
+        }
+    }
+
     /**
      * method to open the IoT Hub client connection for the selected device
      * (deviceId) and calls the message sender class in executor thread, that
@@ -304,25 +451,18 @@ public class DeviceTelemetryService {
 
                 client = new DeviceClient(conStr, msgProtocol);
                 client.open();
-            }            
+            }
             // Register to receive direct method calls.
-            if(!(msgProtocol == IotHubClientProtocol.HTTPS)){
-            client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
+            if (!(msgProtocol == IotHubClientProtocol.HTTPS)) {
+                client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
             }
             // Create new thread and start sending messages
-            MessageSender sender = new MessageSender();
+            //MessageSender sender = new MessageSender();
+            GeoLocationMessgeSender sender = new GeoLocationMessgeSender();
             sender.deviceId = device.getDeviceId();
             //FixedSizeMessageSender sender = new FixedSizeMessageSender();
             executor = Executors.newFixedThreadPool(1);
             executor.execute(sender);            
-            //long startTime = System.currentTimeMillis();
-            //while (false || (System.currentTimeMillis() - startTime) < duration * 60000) {
-            //keep sending operation active until the send duration completes ( in minutes )....
-            //}
-            //executor.shutdownNow();
-            //client.closeNow();
-            //stopSendindTelemetry(device.getDeviceId());
-            // MainForm.txtAreaConsoleOutput.append("Finished sending telemetry.");
         } catch (URISyntaxException | IllegalArgumentException ex) {
             executor.shutdown();
             System.out.println("Error occured while conneting to IoT Hub: " + ex.getMessage());
@@ -359,23 +499,29 @@ public class DeviceTelemetryService {
 
     /**
      * method to stop the telemetry sending forcefully while the device is
-     * currently sending message to cloud. It terminates the currently running thread and stops sending telemetry to cloud.
+     * currently sending message to cloud. It terminates the currently running
+     * thread and stops sending telemetry to cloud.
      *
      * @param deviceId
      */
     public static void stopSendindTelemetry(String deviceId) {
         DBOperations.updateDeviceStatus(deviceId, false);
-        if (!executor.isShutdown() && client!=null) {
-            executor.shutdown();            
-        }
-    }
-    
-    public static void onMainWindowsClosing(){
-        if(client!=null){
+        if (!executor.isShutdown() && client != null) {
             try {
                 client.closeNow();
             } catch (IOException ex) {
-                
+                System.out.println("Client connection closed forcefully: " + ex.getMessage());
+            }
+            executor.shutdown();
+        }
+    }
+
+    public static void onMainWindowsClosing() {
+        if (client != null) {
+            try {
+                client.closeNow();
+            } catch (IOException ex) {
+
                 System.out.println("Main program exit: " + ex.getMessage());
             }
         }
