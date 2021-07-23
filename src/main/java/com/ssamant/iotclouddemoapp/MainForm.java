@@ -5,13 +5,10 @@
  */
 package com.ssamant.iotclouddemoapp;
 
-import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderSymmetricKey;
 import com.ssamant.backendservice.CommandControlService;
 import com.ssamant.backendservice.ReadDeviceToCloudMessages;
-import com.ssamant.connectioninfo.ConnectionInfo;
 import com.ssamant.dbservice.DBOperations;
 import com.ssamant.utilities.CheckBoxWrapperTableModel;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -19,11 +16,9 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -37,6 +32,7 @@ import javax.swing.JOptionPane;
  */
 public class MainForm extends javax.swing.JFrame {
 
+  
     /**
      * Creates new form MainForm
      */
@@ -48,6 +44,7 @@ public class MainForm extends javax.swing.JFrame {
         ((JLabel) comboBoxDirectMethods.getRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         URL url = getClass().getResource("/appIcon.png");
         ImageIcon imgicon = new ImageIcon(url);
+        
         this.setIconImage(imgicon.getImage());
         populateAllDevices(); //populate existing IoT devices into combo box.
         populateTableWithdeviceIds();
