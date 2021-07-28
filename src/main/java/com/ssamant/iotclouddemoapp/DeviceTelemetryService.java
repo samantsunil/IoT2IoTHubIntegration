@@ -198,32 +198,41 @@ public class DeviceTelemetryService {
                 Random rand = new Random();
                 DecimalFormat df = new DecimalFormat("##.##");
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
-                double sensorLocLat = -37.840935f + rand.nextInt(100) / 100.0;
-                double sensorLocLong = 144.946457f + rand.nextInt(100) / 100.0;
+                double sensorLocLat = -37.840935f + rand.nextInt(1) / 1.0;
+                double sensorLocLong = 144.946457f + rand.nextInt(1) / 1.0;
                 long startTime = System.currentTimeMillis();
 
                 while ((System.currentTimeMillis() - startTime) < duration * 60000) {
                     // Simulate telemetry.
-                    double currentTemperature = minTemperature + rand.nextDouble() * 50;
-                    double currentHumidity = minHumidity + rand.nextDouble() * 90;
-                    currentTemperature = Math.round(currentTemperature * 100.0) / 100.0;
-                    currentHumidity = Math.round(currentHumidity * 100.0) / 100.0;
+                    double temp, humidity;
+                    int val = rand.nextInt(2);
+                    if (val == 0) {
+                        double currentTemperature = minTemperature + rand.nextDouble() * 50;
+                        double currentHumidity = minHumidity + rand.nextDouble() * 90;
+                        temp = Math.round(currentTemperature * 100.0) / 100.0;
+                        humidity = Math.round(currentHumidity * 100.0) / 100.0;
+                    } else {
+                        double currentTemperature = minTemperature - rand.nextDouble() * 50;
+                        double currentHumidity = minHumidity - rand.nextDouble() * 90;
+                        temp = Math.round(currentTemperature * 100.0) / 100.0;
+                        humidity = Math.round(currentHumidity * 100.0) / 100.0;
+                    }
 
                     String infoString;
                     String levelValue;
-                    if (currentTemperature > 35.00f) {
-                        if (currentHumidity > 95.00f) {
+                    if (temp > 35.00f) {
+                        if (humidity > 95.00f) {
                             levelValue = "hothumid";
                             infoString = "Hot and humid weather";
-                        } else if (currentHumidity < 20.00f) {
+                        } else if (humidity < 20.00f) {
                             levelValue = "hotdry";
                             infoString = "Hot and dry weather";
                         } else {
                             levelValue = "Hot";
                             infoString = "Hot weather";
                         }
-                    } else if (currentTemperature < 10.00f) {
-                        if (currentHumidity < 20.00f) {
+                    } else if (temp < 10.00f) {
+                        if (humidity < 20.00f) {
                             levelValue = "colddry";
                             infoString = "Cold and dry weather";
                         } else {
@@ -234,10 +243,21 @@ public class DeviceTelemetryService {
                         levelValue = "normal";
                         infoString = "Normal weather";
                     }
+                     //change geo coordinate when device set as moving       
+                    if (turnOn) {
+                        if (val == 0) {
+                            sensorLocLat = sensorLocLat + rand.nextInt(3) / 1.0;
+                            sensorLocLong = sensorLocLong + rand.nextInt(4) / 1.0;
+
+                        } else {
+                            sensorLocLat = sensorLocLat - rand.nextInt(2) / 1.0;
+                            sensorLocLong = sensorLocLong - rand.nextInt(3) / 1.0;
+                        }
+                    }
 
                     TelemetryDataPoint telemetryDataPoint = new TelemetryDataPoint();
-                    telemetryDataPoint.temperature = currentTemperature;
-                    telemetryDataPoint.humidity = currentHumidity;
+                    telemetryDataPoint.temperature = temp;
+                    telemetryDataPoint.humidity = humidity;
                     telemetryDataPoint.lat = sensorLocLat;
                     telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
@@ -321,7 +341,8 @@ public class DeviceTelemetryService {
     private static class GeoLocationMessgeSender implements Runnable {
 
         public String deviceId;
-       int i = 0;
+        int i = 0;
+
         @Override
         public void run() {
             try {
@@ -332,8 +353,8 @@ public class DeviceTelemetryService {
                 Random rand = new Random();
                 DecimalFormat df = new DecimalFormat("##.##");
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
-                double sensorLocLat = -37.840935f + rand.nextInt(4) / 1.0;
-                double sensorLocLong = 144.946457f + rand.nextInt(5) / 1.0;
+                double sensorLocLat = -37.840935f + rand.nextDouble();
+                double sensorLocLong = 144.946457f + rand.nextDouble();
                 long startTime = System.currentTimeMillis();
 
                 while ((System.currentTimeMillis() - startTime) < duration * 60000) {
@@ -342,14 +363,14 @@ public class DeviceTelemetryService {
                     double currentHumidity = minHumidity + rand.nextDouble() * 90;
                     currentTemperature = Math.round(currentTemperature * 100.0) / 100.0;
                     currentHumidity = Math.round(currentHumidity * 100.0) / 100.0;
-                    
+
                     if (turnOn) {
                         if (i % 2 == 0) {
-                            sensorLocLat = sensorLocLat + rand.nextDouble();
-                            sensorLocLong = sensorLocLong + rand.nextDouble();
+                            sensorLocLat = sensorLocLat + rand.nextInt(3) / 1.0;
+                            sensorLocLong = sensorLocLong + rand.nextInt(4) / 1.0;
                         } else {
-                            sensorLocLat = sensorLocLat - rand.nextDouble();
-                            sensorLocLong = sensorLocLong - rand.nextDouble();
+                            sensorLocLat = sensorLocLat - rand.nextInt(2) / 1.0;
+                            sensorLocLong = sensorLocLong - rand.nextInt(3) / 1.0;
                         }
                     }
                     i++;
@@ -402,6 +423,7 @@ public class DeviceTelemetryService {
                     msg.setContentEncoding("utf-8");
                     msg.setContentTypeFinal("application/json");
                     msg.setProperty("level", levelValue);
+                    msg.setProperty("moving", turnOn.toString());
                     msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
 
                     //System.out.println("Sending message: " + msgStr);
@@ -462,7 +484,7 @@ public class DeviceTelemetryService {
             sender.deviceId = device.getDeviceId();
             //FixedSizeMessageSender sender = new FixedSizeMessageSender();
             executor = Executors.newFixedThreadPool(1);
-            executor.execute(sender);            
+            executor.execute(sender);
         } catch (URISyntaxException | IllegalArgumentException ex) {
             executor.shutdown();
             System.out.println("Error occured while conneting to IoT Hub: " + ex.getMessage());
