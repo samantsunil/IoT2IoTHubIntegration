@@ -55,7 +55,7 @@ public class DeviceTelemetryService {
     private static class TelemetryDataPoint {
 
         public String deviceId;
-        public Instant timestamp;
+        public String timestamp;
         public double temperature;
         public double humidity;
         public double lat;
@@ -263,7 +263,7 @@ public class DeviceTelemetryService {
                     telemetryDataPoint.lat = sensorLocLat;
                     telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
-                    telemetryDataPoint.timestamp = Instant.now();
+                    telemetryDataPoint.timestamp = Instant.now().toString();
                     telemetryDataPoint.weatherInfo = infoString;
                     telemetryDataPoint.isMoving = turnOn;
                     // Add the telemetry to the message body as JSON.
