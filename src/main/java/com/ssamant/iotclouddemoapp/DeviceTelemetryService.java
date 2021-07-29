@@ -20,6 +20,7 @@ import java.awt.Point;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -54,6 +55,7 @@ public class DeviceTelemetryService {
     private static class TelemetryDataPoint {
 
         public String deviceId;
+        public Instant timestamp;
         public double temperature;
         public double humidity;
         public double lat;
@@ -261,6 +263,7 @@ public class DeviceTelemetryService {
                     telemetryDataPoint.lat = sensorLocLat;
                     telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
+                    telemetryDataPoint.timestamp = Instant.now();
                     telemetryDataPoint.weatherInfo = infoString;
                     telemetryDataPoint.isMoving = turnOn;
                     // Add the telemetry to the message body as JSON.
@@ -445,6 +448,7 @@ public class DeviceTelemetryService {
                 MainForm.txtAreaConsoleOutput.append("Finished sending telemetry.");
                 lblSendStopMsg.setText("Finished telemetry sending operation for the defined duration.");
                 DBOperations.updateDeviceStatus(deviceId, false);
+                
                 client.closeNow();
                 executor.shutdownNow();
             } catch (InterruptedException e) {
@@ -479,8 +483,8 @@ public class DeviceTelemetryService {
                 client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
             }
             // Create new thread and start sending messages
-            //MessageSender sender = new MessageSender();
-            GeoLocationMessgeSender sender = new GeoLocationMessgeSender();
+            MessageSender sender = new MessageSender();
+            //GeoLocationMessgeSender sender = new GeoLocationMessgeSender();
             sender.deviceId = device.getDeviceId();
             //FixedSizeMessageSender sender = new FixedSizeMessageSender();
             executor = Executors.newFixedThreadPool(1);
