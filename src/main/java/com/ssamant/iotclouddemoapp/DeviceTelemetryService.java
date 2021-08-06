@@ -56,8 +56,8 @@ public class DeviceTelemetryService {
 
         public String deviceId;
         public String timestamp;
-        public double temperature;
-        public double humidity;
+        public int temperature;
+        public int humidity;
         public double lat;
         public double lon;
         public String weatherInfo;
@@ -258,8 +258,8 @@ public class DeviceTelemetryService {
                     }
 
                     TelemetryDataPoint telemetryDataPoint = new TelemetryDataPoint();
-                    telemetryDataPoint.temperature = temp;
-                    telemetryDataPoint.humidity = humidity;
+                    telemetryDataPoint.temperature = (int) temp;
+                    telemetryDataPoint.humidity = (int) humidity;
                     telemetryDataPoint.lat = sensorLocLat;
                     telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
@@ -276,7 +276,7 @@ public class DeviceTelemetryService {
                     msg.setContentEncoding("utf-8");
                     msg.setContentTypeFinal("application/json");
                     msg.setProperty("level", levelValue);
-                    msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
+                   // msg.setExpiryTime(D2C_MESSAGE_TIMEOUT);
 
                     //System.out.println("Sending message: " + msgStr);
                     System.out.println(String.format("%s > Message: %s", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(dtf), msgStr));
@@ -297,7 +297,9 @@ public class DeviceTelemetryService {
                 MainForm.txtAreaConsoleOutput.append("Finished sending telemetry.");
                 lblSendStopMsg.setText("Finished telemetry sending operation for the defined duration.");
                 DBOperations.updateDeviceStatus(deviceId, false);
+                
                 client.closeNow();
+                Thread.sleep(2000);
                 executor.shutdownNow();
             } catch (InterruptedException e) {
                 //System.out.println("Finished.");
@@ -450,7 +452,7 @@ public class DeviceTelemetryService {
                 DBOperations.updateDeviceStatus(deviceId, false);
                 
                 client.closeNow();
-                executor.shutdownNow();
+                executor.shutdown();
             } catch (InterruptedException e) {
                 //System.out.println("Finished.");
                 System.out.println(e.getMessage());
@@ -471,13 +473,12 @@ public class DeviceTelemetryService {
      */
     public static void SendTelemetry(Device device, IotHubClientProtocol msgProtocol) throws IOException {
 
-        try {
-            if (client == null) {
+        try {            
                 String conStr = "HostName=" + device.getIotHubUri().trim() + ";DeviceId=" + device.getDeviceId().trim() + ";SharedAccessKey=" + device.getConnectionString().trim();
 
                 client = new DeviceClient(conStr, msgProtocol);
                 client.open();
-            }
+            
             // Register to receive direct method calls.
             if (!(msgProtocol == IotHubClientProtocol.HTTPS)) {
                 client.subscribeToDeviceMethod(new DirectMethodCallback(), null, new DirectMethodStatusCallback(), null);
