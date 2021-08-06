@@ -24,5 +24,7 @@ public class DeviceDeprovisionService {
     private static final String REGISTRATION_ID = ConnectionInfo.getRegIdIndividual();
     private static final ProvisioningStatus PROVISIONING_STATUS = ProvisioningStatus.ENABLED;
     
-    
+    public static void removeIoTDevice(){
+        
+    }
 }

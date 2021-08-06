@@ -91,9 +91,6 @@ public class MainForm extends javax.swing.JFrame {
         jPanelSendTelemetry = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtAreaConsoleOutput = new javax.swing.JTextArea();
-        jPanelDeviceDetails = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tableDeviceInfo = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jComboBoxActiveDevices = new javax.swing.JComboBox<>();
@@ -401,45 +398,6 @@ public class MainForm extends javax.swing.JFrame {
 
         tabbedPaneMain.addTab("View Telemetry Streaming From Device", jPanelSendTelemetry);
 
-        tableDeviceInfo.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Device ID", "Message Protocol", "Message Size", "Telemetry Interval"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, true, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(tableDeviceInfo);
-
-        javax.swing.GroupLayout jPanelDeviceDetailsLayout = new javax.swing.GroupLayout(jPanelDeviceDetails);
-        jPanelDeviceDetails.setLayout(jPanelDeviceDetailsLayout);
-        jPanelDeviceDetailsLayout.setHorizontalGroup(
-            jPanelDeviceDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelDeviceDetailsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1158, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanelDeviceDetailsLayout.setVerticalGroup(
-            jPanelDeviceDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelDeviceDetailsLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-
-        tabbedPaneMain.addTab("View Device Details", jPanelDeviceDetails);
-
         jLabel8.setText("Select a device:");
 
         jComboBoxActiveDevices.setAutoscrolls(true);
@@ -745,7 +703,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnStopSendingActionPerformed
 
     private void btnDeviceDeregisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeviceDeregisterActionPerformed
-
+     
 
     }//GEN-LAST:event_btnDeviceDeregisterActionPerformed
 
@@ -989,10 +947,8 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     public javax.swing.JPanel jPanelConfigParams;
-    public javax.swing.JPanel jPanelDeviceDetails;
     private javax.swing.JPanel jPanelImage;
     public javax.swing.JPanel jPanelSendTelemetry;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPaneDeviceList;
@@ -1004,7 +960,6 @@ public class MainForm extends javax.swing.JFrame {
     public static javax.swing.JLabel lblSendStopMsg;
     private javax.swing.JRadioButton radioButtonBatchMode;
     private javax.swing.JTabbedPane tabbedPaneMain;
-    private javax.swing.JTable tableDeviceInfo;
     public static javax.swing.JTextArea txtAreaConsoleOutput;
     private javax.swing.JTextField txtFieldBatchReadSize;
     private javax.swing.JTextField txtFieldDeviceOwner;

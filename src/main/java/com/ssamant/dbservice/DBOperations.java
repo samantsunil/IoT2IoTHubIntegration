@@ -233,16 +233,28 @@ public class DBOperations {
             if (ConnectionInfo.con == null) {
                 ConnectionInfo.con = getDbConnection();
             }
-            String Updatequery = "DELETE FROM deviceinfo WHERE deviceid = ?";
-            try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
-                pstmt.setString(1, deviceId);
+            Statement st = ConnectionInfo.con.createStatement();
+            st.addBatch("DELETE FROM deviceinfo WHERE deviceid = '" + deviceId + "';");
+            st.addBatch("DELETE FROM devicecallbackmethod WHERE deviceid = '" + deviceId + "';");
 
-                pstmt.executeUpdate();
-                pstmt.close();
-            }
+            st.executeBatch();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
+//        try {
+//            if (ConnectionInfo.con == null) {
+//                ConnectionInfo.con = getDbConnection();
+//            }
+//            String Updatequery = "DELETE FROM deviceinfo WHERE deviceid = ?";
+//            try (PreparedStatement pstmt = ConnectionInfo.con.prepareStatement(Updatequery)) {
+//                pstmt.setString(1, deviceId);
+//
+//                pstmt.executeUpdate();
+//                pstmt.close();
+//            }
+//        } catch (SQLException ex) {
+//            System.out.println(ex.getMessage());
+//        }
     }
 
 }

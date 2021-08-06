@@ -16,20 +16,18 @@ import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.Message;
 import com.ssamant.dbservice.DBOperations;
 import static com.ssamant.iotclouddemoapp.MainForm.lblSendStopMsg;
-import java.awt.Point;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -156,27 +154,12 @@ public class DeviceTelemetryService {
                 }
 
                 case "SetDeviceMobilityONorOFF": {
-                    Boolean val;
+                    Boolean isMobile;
                     try {
-                        int status = METHOD_SUCCESS;
-                        switch (payload) {
-                            case "ON":
-                            case "On":
-                            case "on":
-                                val = true;
-                                break;
-                            case "OFF":
-                            case "Off":
-                            case "off":
-                                val = false;
-                                break;
-                            default:
-                                val = false;
-                                break;
-                        }
-                        //val = Boolean.parseBoolean(payload);
+                        int status = METHOD_SUCCESS;                        
+                        isMobile = Boolean.parseBoolean(payload);
                         System.out.println(payload);
-                        changeDeviceMobilityStatus(val);
+                        changeDeviceMobilityStatus(isMobile);
                         deviceMethodData = new DeviceMethodData(status, "Executed direct method " + methodName);
                     } catch (NumberFormatException e) {
                         int status = INVALID_PARAMETER;
@@ -222,8 +205,8 @@ public class DeviceTelemetryService {
                 while ((System.currentTimeMillis() - startTime) < duration * 60000) {
                     // Simulate telemetry.
                     double temp, humidity;
-                    int val = rand.nextInt(2);
-                    if (val == 0) {
+                    int rndVal = rand.nextInt(2);
+                    if (rndVal == 0) {
                         double currentTemperature = minTemperature + rand.nextDouble() * 50;
                         double currentHumidity = minHumidity + rand.nextDouble() * 60;
                         temp = Math.round(currentTemperature * 100.0) / 100.0;
@@ -262,7 +245,7 @@ public class DeviceTelemetryService {
                     }
                      //change geo coordinate when device set as moving       
                     if (turnOn) {
-                        if (val == 0) {
+                        if (rndVal == 0) {
                             sensorLocLat = sensorLocLat - rand.nextDouble();
                             sensorLocLong = sensorLocLong + rand.nextDouble();
 
@@ -278,7 +261,7 @@ public class DeviceTelemetryService {
                     telemetryDataPoint.lat = sensorLocLat;
                     telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
-                    telemetryDataPoint.timestamp = Instant.now().toString();
+                    telemetryDataPoint.timestamp = LocalTime.from(Instant.now()).toString();//Instant.now().toString();
                     telemetryDataPoint.weatherInfo = infoString;
                     telemetryDataPoint.isMoving = turnOn;
                     // Add the telemetry to the message body as JSON.
@@ -527,7 +510,7 @@ public class DeviceTelemetryService {
             } else if ("MQTT".equals(device.getProtocol())) {
                 msgProtocol = IotHubClientProtocol.MQTT;
             } else {
-                msgProtocol = IotHubClientProtocol.HTTPS;
+                msgProtocol = IotHubClientProtocol.HTTPS; //default
             }
             SendTelemetry(device, msgProtocol);
             retVal = 1;

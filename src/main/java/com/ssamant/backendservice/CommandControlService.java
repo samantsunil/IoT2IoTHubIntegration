@@ -12,8 +12,6 @@ import com.ssamant.connectioninfo.ConnectionInfo;
 import static com.ssamant.iotclouddemoapp.MainForm.lblReadControlMsg;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class implements the methods to pass the payload to control the
@@ -25,7 +23,7 @@ import java.util.logging.Logger;
  */
 public class CommandControlService {
 
-    private static String iotHubConnString = ConnectionInfo.getIoTHubConnectionString();
+    private static final String iotHubConnString = ConnectionInfo.getIoTHubConnectionString();
 
     private static final Long RESPONSE_TIMEOUT = TimeUnit.SECONDS.toSeconds(30);
     private static final Long CONNECT_TIMEOUT = TimeUnit.SECONDS.toSeconds(5);
