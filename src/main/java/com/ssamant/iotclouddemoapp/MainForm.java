@@ -498,6 +498,12 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        comboBoxDirectMethods.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxDirectMethodsActionPerformed(evt);
+            }
+        });
+
         btnClearTextArea.setText("Clear Messages");
         btnClearTextArea.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -844,6 +850,10 @@ public class MainForm extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         DeviceTelemetryService.onMainWindowsClosing();
     }//GEN-LAST:event_formWindowClosing
+
+    private void comboBoxDirectMethodsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxDirectMethodsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboBoxDirectMethodsActionPerformed
 
     /**
      * function to populate the device info into table as well as deleting the

@@ -130,7 +130,7 @@ public class DeviceTelemetryService {
             interval = interval * val;
         }
 
-        private void turnOffTelemetrySending(Boolean val) {
+        private void changeDeviceMobilityStatus(Boolean val) {
             System.out.println("Direct method # send command to turn Off the telemetry sending.");
             turnOn = val;
         }
@@ -155,13 +155,28 @@ public class DeviceTelemetryService {
                     break;
                 }
 
-                case "TurnOffTelemetrySending": {
+                case "SetDeviceMobilityONorOFF": {
                     Boolean val;
                     try {
                         int status = METHOD_SUCCESS;
+                        switch (payload) {
+                            case "ON":
+                            case "On":
+                            case "on":
+                                val = true;
+                                break;
+                            case "OFF":
+                            case "Off":
+                            case "off":
+                                val = false;
+                                break;
+                            default:
+                                val = false;
+                                break;
+                        }
                         val = Boolean.parseBoolean(payload);
                         System.out.println(payload);
-                        turnOffTelemetrySending(val);
+                        changeDeviceMobilityStatus(val);
                         deviceMethodData = new DeviceMethodData(status, "Executed direct method " + methodName);
                     } catch (NumberFormatException e) {
                         int status = INVALID_PARAMETER;
@@ -194,14 +209,14 @@ public class DeviceTelemetryService {
         public void run() {
             try {
                 // Initialize the simulated telemetry data.
-                double minTemperature = 0;
-                double minHumidity = 10;
+                double minTemperature = 10;
+                double minHumidity = 20;
 
                 Random rand = new Random();
                 DecimalFormat df = new DecimalFormat("##.##");
                 DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
-                double sensorLocLat = -37.840935f + rand.nextInt(1) / 1.0;
-                double sensorLocLong = 144.946457f + rand.nextInt(1) / 1.0;
+                double sensorLocLat = -37.840935f + rand.nextDouble();
+                double sensorLocLong = 144.946457f + rand.nextDouble();
                 long startTime = System.currentTimeMillis();
 
                 while ((System.currentTimeMillis() - startTime) < duration * 60000) {
@@ -210,12 +225,12 @@ public class DeviceTelemetryService {
                     int val = rand.nextInt(2);
                     if (val == 0) {
                         double currentTemperature = minTemperature + rand.nextDouble() * 50;
-                        double currentHumidity = minHumidity + rand.nextDouble() * 90;
+                        double currentHumidity = minHumidity + rand.nextDouble() * 60;
                         temp = Math.round(currentTemperature * 100.0) / 100.0;
                         humidity = Math.round(currentHumidity * 100.0) / 100.0;
                     } else {
                         double currentTemperature = minTemperature - rand.nextDouble() * 50;
-                        double currentHumidity = minHumidity - rand.nextDouble() * 90;
+                        double currentHumidity = minHumidity - rand.nextDouble() * 60;
                         temp = Math.round(currentTemperature * 100.0) / 100.0;
                         humidity = Math.round(currentHumidity * 100.0) / 100.0;
                     }
@@ -248,12 +263,12 @@ public class DeviceTelemetryService {
                      //change geo coordinate when device set as moving       
                     if (turnOn) {
                         if (val == 0) {
-                            sensorLocLat = sensorLocLat + rand.nextInt(3) / 1.0;
-                            sensorLocLong = sensorLocLong + rand.nextInt(4) / 1.0;
+                            sensorLocLat = sensorLocLat - rand.nextDouble();
+                            sensorLocLong = sensorLocLong + rand.nextDouble();
 
                         } else {
-                            sensorLocLat = sensorLocLat - rand.nextInt(2) / 1.0;
-                            sensorLocLong = sensorLocLong - rand.nextInt(3) / 1.0;
+                            sensorLocLat = sensorLocLat + rand.nextDouble();
+                            sensorLocLong = sensorLocLong - rand.nextDouble();
                         }
                     }
 
