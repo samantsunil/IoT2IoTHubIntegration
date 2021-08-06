@@ -174,7 +174,7 @@ public class DeviceTelemetryService {
                                 val = false;
                                 break;
                         }
-                        val = Boolean.parseBoolean(payload);
+                        //val = Boolean.parseBoolean(payload);
                         System.out.println(payload);
                         changeDeviceMobilityStatus(val);
                         deviceMethodData = new DeviceMethodData(status, "Executed direct method " + methodName);
