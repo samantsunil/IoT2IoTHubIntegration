@@ -261,7 +261,8 @@ public class DeviceTelemetryService {
                     telemetryDataPoint.lat = sensorLocLat;
                     telemetryDataPoint.lon = sensorLocLong;
                     telemetryDataPoint.deviceId = devID;
-                    telemetryDataPoint.timestamp = LocalTime.from(Instant.now()).toString();//Instant.now().toString();
+                    //telemetryDataPoint.timestamp = LocalTime.from(Instant.now()).toString();//Instant.now().toString();
+                    telemetryDataPoint.timestamp = LocalDateTime.now().toString();
                     telemetryDataPoint.weatherInfo = infoString;
                     telemetryDataPoint.isMoving = turnOn;
                     // Add the telemetry to the message body as JSON.
